@@ -215,43 +215,46 @@ const SellerProducts = () => {
       ) : products.length === 0 ? (
         <p>You haven't listed any products yet. Click "Add Product" to get started.</p>
       ) : (
-        <table className="orders-table seller-products-table">
-          <thead>
-            <tr>
-              <th></th>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Stock</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((p) => (
-              <tr key={p._id}>
-                <td>
-                  <img src={p.image} alt={p.name} className="table-thumb" onError={(e) => (e.target.style.visibility = "hidden")} />
-                </td>
-                <td>{p.name}</td>
-                <td>{p.category}</td>
-                <td>{formatPrice(p.price)}</td>
-                <td>
-                  <span className={p.countInStock === 0 ? "off-tag" : ""}>
-                    {p.countInStock === 0 ? "Out of stock" : p.countInStock}
-                  </span>
-                </td>
-                <td className="table-actions">
-                  <button className="icon-btn" onClick={() => openEditForm(p)} title="Edit">
-                    <Pencil size={16} />
-                  </button>
-                  <button className="icon-btn" onClick={() => handleDelete(p._id)} title="Delete">
-                    <Trash2 size={16} />
-                  </button>
-                </td>
+        <div className="responsive-table-wrapper">
+          <table className="orders-table seller-products-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {products.map((p) => (
+                <tr key={p._id}>
+                  <td>
+                    <img src={p.image} alt={p.name} className="table-thumb" onError={(e) => (e.target.style.visibility = "hidden")} />
+                  </td>
+                  <td>{p.name}</td>
+                  <td>{p.category}</td>
+                  <td>{formatPrice(p.price)}</td>
+                  <td>
+                    <span className={p.countInStock === 0 ? "off-tag" : ""}>
+                      {p.countInStock === 0 ? "Out of stock" : p.countInStock}
+                    </span>
+                  </td>
+                  <td className="table-actions">
+                    <button className="icon-btn" onClick={() => openEditForm(p)} title="Edit">
+                      <Pencil size={16} />
+                    </button>
+                    <button className="icon-btn" onClick={() => handleDelete(p._id)} title="Delete">
+                      <Trash2 size={16} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
       )}
     </div>
   );

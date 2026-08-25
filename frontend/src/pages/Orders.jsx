@@ -26,32 +26,35 @@ const Orders = () => {
       {orders.length === 0 ? (
         <p>You have no orders yet.</p>
       ) : (
-        <table className="orders-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Date</th>
-              <th>Total</th>
-              <th>Paid</th>
-              <th>Delivered</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order._id}>
-                <td>{order._id}</td>
-                <td>{new Date(order.createdAt).toLocaleDateString()}</td>
-                <td>{formatPrice(order.totalPrice)}</td>
-                <td>{order.isPaid ? "✅" : "❌"}</td>
-                <td>{order.isDelivered ? "✅" : "❌"}</td>
-                <td>
-                  <Link to={`/orders/${order._id}`}>Details</Link>
-                </td>
+        <div className="responsive-table-wrapper">
+          <table className="orders-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Total</th>
+                <th>Paid</th>
+                <th>Delivered</th>
+                <th></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr key={order._id}>
+                  <td>{order._id}</td>
+                  <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                  <td>{formatPrice(order.totalPrice)}</td>
+                  <td>{order.isPaid ? "✅" : "❌"}</td>
+                  <td>{order.isDelivered ? "✅" : "❌"}</td>
+                  <td>
+                    <Link to={`/orders/${order._id}`}>Details</Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
       )}
     </div>
   );

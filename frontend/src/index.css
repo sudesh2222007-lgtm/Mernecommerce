@@ -1008,19 +1008,264 @@ button:disabled {
   margin: 0;
 }
 
-/* ============ Responsive ============ */
+/* ============ Mobile Responsive & Alignments ============ */
+.mobile-actions {
+  display: none;
+}
+
+.mobile-toggle-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+
+.responsive-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+
+.responsive-table-wrapper .orders-table,
+.responsive-table-wrapper .seller-products-table {
+  min-width: 650px;
+  box-shadow: none;
+}
+
 @media (max-width: 768px) {
+  html, body {
+    overflow-x: hidden;
+  }
+
+  .container {
+    padding: 20px 14px 40px;
+    width: 100%;
+  }
+
+  /* Navbar Mobile */
+  .navbar-inner {
+    padding: 12px 16px;
+    position: relative;
+  }
+
+  .mobile-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .mobile-cart-icon {
+    color: #fff;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .desktop-cart-link {
+    display: none;
+  }
+
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--navy);
+    flex-direction: column;
+    padding: 16px 20px 24px;
+    align-items: stretch;
+    gap: 16px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 100;
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .nav-user-group {
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    padding-left: 0;
+    padding-top: 14px;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  /* Hero Mobile */
+  .hero {
+    padding: 40px 16px;
+  }
+
+  .hero h1 {
+    font-size: 1.8rem;
+  }
+
+  .hero p {
+    font-size: 0.92rem;
+    margin-bottom: 20px;
+  }
+
+  .hero-search {
+    width: 100%;
+    padding: 4px 4px 4px 14px;
+  }
+
+  .hero-search input {
+    font-size: 0.88rem;
+  }
+
+  .hero-search button {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+
+  /* Category pills mobile */
+  .category-pills {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 6px;
+    margin-bottom: 20px;
+  }
+
+  .category-pills::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pill {
+    flex-shrink: 0;
+    padding: 6px 14px;
+    font-size: 0.82rem;
+  }
+
+  /* Product Grid Mobile (2-column layout) */
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .product-card-body {
+    padding: 10px 12px 14px;
+    gap: 4px;
+  }
+
+  .product-card-title {
+    font-size: 0.88rem;
+  }
+
+  .price {
+    font-size: 0.96rem;
+  }
+
+  .quick-add-btn {
+    position: static;
+    bottom: auto;
+    margin-top: 6px;
+    width: 100%;
+    padding: 8px;
+    font-size: 0.78rem;
+  }
+
+  /* Product Details Mobile */
   .product-details {
     grid-template-columns: 1fr;
+    gap: 24px;
   }
-  .hero h1 {
-    font-size: 2rem;
+
+  .details-info h1 {
+    font-size: 1.4rem;
   }
-  .navbar-inner {
-    flex-wrap: wrap;
+
+  .trust-row {
+    flex-direction: column;
     gap: 10px;
   }
-  .nav-links {
-    gap: 14px;
+
+  /* Form Containers Mobile */
+  .form-container {
+    max-width: 100%;
+  }
+
+  .form-container form {
+    padding: 20px 16px;
+  }
+
+  /* Cart Mobile */
+  .cart-item {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .cart-item img {
+    width: 52px;
+    height: 52px;
+  }
+
+  .cart-summary,
+  .order-summary {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  /* Seller Dashboard Mobile */
+  .seller-tabs {
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+    margin: 14px 0 20px;
+  }
+
+  .seller-tab {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .stat-card {
+    padding: 14px;
+    gap: 10px;
+  }
+
+  .stat-card h3 {
+    font-size: 1.25rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-perks {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 28px 16px;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
   }
 }
+
+@media (max-width: 400px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

@@ -7,8 +7,7 @@ const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
 dotenv.config({ path: path.resolve(__dirname, ".env") });
 
-// Fail fast with a clear message instead of a cryptic mongoose crash
-if (!process.env.MONGO_URI) {
+if (!process.env.MONGO_URI && process.env.NODE_ENV !== "production") {
   console.error(
     "\n❌ MONGO_URI is not set.\n" +
       "   Make sure a file named exactly '.env' exists in the backend/ folder\n" +
@@ -16,12 +15,25 @@ if (!process.env.MONGO_URI) {
       "   and that it contains a line like:\n" +
       "   MONGO_URI=mongodb://127.0.0.1:27017/mern_ecommerce\n"
   );
-  process.exit(1);
 }
 
-connectDB();
+if (process.env.MONGO_URI) {
+  connectDB();
+}
 
 const app = express();
+
+// Ensure DB is connected for serverless invocations
+app.use(async (req, res, next) => {
+  if (process.env.MONGO_URI) {
+    try {
+      await connectDB();
+    } catch (err) {
+      return res.status(500).json({ message: "Database connection failed", error: err.message });
+    }
+  }
+  next();
+});
 
 // Middleware
 // CLIENT_URL should be set to your deployed frontend's URL in production
@@ -53,8 +65,12 @@ app.get("/", (req, res) => {
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+if (require.main === module) {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () =>
+    console.log(`🚀 Server running in ${process.env.NODE_ENV || "development"} mode on port ${PORT}`)
+  );
+}
 
-app.listen(PORT, () =>
-  console.log(`🚀 Server running in ${process.env.NODE_ENV || "development"} mode on port ${PORT}`)
-);
+module.exports = app;
+
