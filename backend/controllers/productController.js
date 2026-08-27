@@ -1,12 +1,16 @@
 const Product = require("../models/Product");
+const autoSeedIfEmpty = require("../utils/autoSeed");
 
-// @desc    Fetch all products (supports keyword search + pagination)
-// @route   GET /api/products
-// @access  Public
 const getProducts = async (req, res) => {
   try {
     const pageSize = Number(req.query.limit) || 10;
     const page = Number(req.query.page) || 1;
+
+    let count = await Product.countDocuments();
+    if (count === 0) {
+      await autoSeedIfEmpty();
+      count = await Product.countDocuments();
+    }
 
     const keyword = req.query.keyword
       ? {
@@ -21,7 +25,7 @@ const getProducts = async (req, res) => {
 
     const filter = { ...keyword, ...category };
 
-    const count = await Product.countDocuments(filter);
+    const totalFiltered = await Product.countDocuments(filter);
     const products = await Product.find(filter)
       .limit(pageSize)
       .skip(pageSize * (page - 1))
@@ -30,8 +34,8 @@ const getProducts = async (req, res) => {
     res.json({
       products,
       page,
-      pages: Math.ceil(count / pageSize),
-      total: count,
+      pages: Math.ceil(totalFiltered / pageSize),
+      total: totalFiltered,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
