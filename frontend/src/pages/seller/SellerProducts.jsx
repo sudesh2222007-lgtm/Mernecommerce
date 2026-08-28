@@ -224,7 +224,7 @@ const SellerProducts = () => {
                 <th>Category</th>
                 <th>Price</th>
                 <th>Stock</th>
-                <th></th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -242,11 +242,11 @@ const SellerProducts = () => {
                     </span>
                   </td>
                   <td className="table-actions">
-                    <button className="icon-btn" onClick={() => openEditForm(p)} title="Edit">
-                      <Pencil size={16} />
+                    <button className="icon-btn edit-btn" onClick={() => openEditForm(p)} title="Edit Product">
+                      <Pencil size={16} /> Edit
                     </button>
-                    <button className="icon-btn" onClick={() => handleDelete(p._id)} title="Delete">
-                      <Trash2 size={16} />
+                    <button className="icon-btn delete-btn" onClick={() => handleDelete(p._id)} title="Delete Product">
+                      <Trash2 size={16} color="#e53e3e" /> Delete
                     </button>
                   </td>
                 </tr>
