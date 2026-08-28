@@ -1296,7 +1296,14 @@ button:disabled {
 
 @media (max-width: 400px) {
   .product-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .product-card-body {
+    padding: 8px 8px 10px;
+  }
+  .product-card-title {
+    font-size: 0.82rem;
   }
 }
 
