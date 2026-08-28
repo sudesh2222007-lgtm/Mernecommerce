@@ -332,7 +332,7 @@ button:disabled {
 /* ============ Product Grid / Card ============ */
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr) !important;
+  grid-template-columns: repeat(4, 1fr);
   gap: 22px;
 }
 
@@ -1181,7 +1181,7 @@ button:disabled {
 
   /* Product Grid Mobile (2-column layout) */
   .product-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr) !important;
     gap: 12px;
   }
 
