@@ -1,0 +1,385 @@
+{
+  "info": {
+    "name": "MERN E-Commerce API",
+    "description": "Full API collection for the MERN Stack E-Commerce Mini Project. Import this along with the accompanying environment file. Run 'Login (User)' or 'Login (Admin)' first — the token is saved automatically to the environment for all other requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const data = pm.response.json();",
+                  "  pm.environment.set(\"token\", data.token);",
+                  "  pm.environment.set(\"userId\", data._id);",
+                  "  console.log(\"Token saved:\", data.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login (User)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  pm.environment.set(\"token\", data.token);",
+                  "  pm.environment.set(\"userId\", data._id);",
+                  "  console.log(\"User token saved\");",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  pm.environment.set(\"adminToken\", data.token);",
+                  "  console.log(\"Admin token saved\");",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "profile"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/products?keyword=&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"],
+              "query": [
+                { "key": "keyword", "value": "" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  if (data.products && data.products.length > 0) {",
+                  "    pm.environment.set(\"productId\", data.products[0]._id);",
+                  "    console.log(\"Saved productId:\", data.products[0]._id);",
+                  "  }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search Products",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/products?keyword=shoes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"],
+              "query": [{ "key": "keyword", "value": "shoes" }]
+            }
+          }
+        },
+        {
+          "name": "Filter By Category",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/products?category=Electronics",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"],
+              "query": [{ "key": "category", "value": "Electronics" }]
+            }
+          }
+        },
+        {
+          "name": "Get Product By ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "{{productId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Product (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Product\",\n  \"price\": 29.99,\n  \"description\": \"A great new product\",\n  \"image\": \"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80\",\n  \"brand\": \"Generic\",\n  \"category\": \"Electronics\",\n  \"countInStock\": 10\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const data = pm.response.json();",
+                  "  pm.environment.set(\"createdProductId\", data._id);",
+                  "  console.log(\"Created product id saved:\", data._id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Product (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 34.99,\n  \"countInStock\": 25\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{createdProductId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "{{createdProductId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Product (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{createdProductId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "{{createdProductId}}"]
+            }
+          }
+        },
+        {
+          "name": "Add Product Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 5,\n  \"comment\": \"Excellent quality, fast shipping!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{productId}}/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "{{productId}}", "reviews"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderItems\": [\n    {\n      \"name\": \"Aria Wireless Headphones\",\n      \"qty\": 1,\n      \"image\": \"https://images.unsplash.com/photo-1505740420928-5e560c06d30e\",\n      \"price\": 59.99,\n      \"product\": \"{{productId}}\"\n    }\n  ],\n  \"shippingAddress\": {\n    \"address\": \"123 Main St\",\n    \"city\": \"Chennai\",\n    \"postalCode\": \"600001\",\n    \"country\": \"India\"\n  },\n  \"paymentMethod\": \"Cash on Delivery\",\n  \"itemsPrice\": 59.99,\n  \"shippingPrice\": 10,\n  \"taxPrice\": 3.5,\n  \"totalPrice\": 73.49\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const data = pm.response.json();",
+                  "  pm.environment.set(\"orderId\", data._id);",
+                  "  console.log(\"Order id saved:\", data._id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get My Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/myorders",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "myorders"]
+            }
+          }
+        },
+        {
+          "name": "Get Order By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/{{orderId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "{{orderId}}"]
+            }
+          }
+        },
+        {
+          "name": "Mark Order Paid",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/{{orderId}}/pay",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "{{orderId}}", "pay"]
+            }
+          }
+        },
+        {
+          "name": "Mark Order Delivered (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/{{orderId}}/deliver",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", "{{orderId}}", "deliver"]
+            }
+          }
+        },
+        {
+          "name": "Get All Orders (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
