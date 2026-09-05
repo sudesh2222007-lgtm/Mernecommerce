@@ -6,11 +6,8 @@ const getProducts = async (req, res) => {
     const pageSize = Number(req.query.limit) || 10;
     const page = Number(req.query.page) || 1;
 
-    let count = await Product.countDocuments();
-    if (count === 0) {
-      await autoSeedIfEmpty();
-      count = await Product.countDocuments();
-    }
+    // Fast-path: autoSeed utility checks internally and sets flag
+    autoSeedIfEmpty();
 
     const keyword = req.query.keyword
       ? {

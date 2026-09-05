@@ -57,23 +57,18 @@ const Home = () => {
       <section className="hero">
         <div className="hero-content">
           <span className="hero-eyebrow">New Season Arrivals</span>
-          <h1>
-            Everyday essentials,
-            <br /> made to last.
-          </h1>
-          <p>
-            Thoughtfully sourced electronics, fashion, footwear and home
-            essentials — shipped fast, backed by real reviews.
-          </p>
           <form onSubmit={handleSearch} className="hero-search">
             <Search size={18} />
             <input
               type="text"
               placeholder="Search for headphones, shoes, watches..."
               value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                setKeyword(val);
+                fetchProducts(val, activeCategory);
+              }}
             />
-            <button type="submit">Search</button>
           </form>
         </div>
       </section>
