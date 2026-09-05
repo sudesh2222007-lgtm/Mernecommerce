@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Search } from "lucide-react";
 import api from "../api/axios";
 import ProductCard from "../components/ProductCard";
@@ -18,10 +18,12 @@ const Home = () => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  
+  const searchTimeoutRef = useRef(null);
 
   const fetchProducts = async (search = "", category = "All") => {
     try {
-      setLoading(true);
+      if (products.length === 0) setLoading(true);
       const categoryParam =
         category !== "All"
           ? `&category=${encodeURIComponent(category)}`
@@ -29,7 +31,7 @@ const Home = () => {
       const { data } = await api.get(
         `/products?keyword=${encodeURIComponent(search)}${categoryParam}`
       );
-      setProducts(data.products);
+      setProducts(data.products || []);
       setError("");
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong");
@@ -42,8 +44,19 @@ const Home = () => {
     fetchProducts();
   }, []);
 
-  const handleSearch = (e) => {
+  const handleSearchChange = (val) => {
+    setKeyword(val);
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    searchTimeoutRef.current = setTimeout(() => {
+      fetchProducts(val, activeCategory);
+    }, 250);
+  };
+
+  const handleSearchSubmit = (e) => {
     e.preventDefault();
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
     fetchProducts(keyword, activeCategory);
   };
 
@@ -57,17 +70,13 @@ const Home = () => {
       <section className="hero">
         <div className="hero-content">
           <span className="hero-eyebrow">New Season Arrivals</span>
-          <form onSubmit={handleSearch} className="hero-search">
+          <form onSubmit={handleSearchSubmit} className="hero-search">
             <Search size={18} />
             <input
               type="text"
-              placeholder="Search for headphones, shoes, watches..."
+              placeholder="Search products..."
               value={keyword}
-              onChange={(e) => {
-                const val = e.target.value;
-                setKeyword(val);
-                fetchProducts(val, activeCategory);
-              }}
+              onChange={(e) => handleSearchChange(e.target.value)}
             />
           </form>
         </div>
@@ -91,7 +100,7 @@ const Home = () => {
           <span className="section-count">{products.length} items</span>
         </div>
 
-        {loading && <p className="muted">Loading products...</p>}
+        {loading && products.length === 0 && <p className="muted">Loading products...</p>}
         {error && <p className="error">{error}</p>}
 
         <div className="product-grid">

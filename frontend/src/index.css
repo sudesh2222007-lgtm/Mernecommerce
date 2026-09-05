@@ -219,11 +219,11 @@ button:disabled {
 .hero {
   background: linear-gradient(135deg, var(--navy) 0%, var(--navy-soft) 100%);
   color: #fff;
-  padding: 20px 24px;
+  padding: 14px 16px;
 }
 
 .hero-content {
-  max-width: 640px;
+  max-width: 600px;
   margin: 0 auto;
   text-align: center;
 }
@@ -232,13 +232,13 @@ button:disabled {
   display: inline-block;
   background: rgba(255, 90, 60, 0.18);
   color: #ff9a80;
-  padding: 4px 12px;
+  padding: 3px 10px;
   border-radius: 999px;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 
 .hero p {
@@ -253,8 +253,9 @@ button:disabled {
   gap: 10px;
   background: #fff;
   border-radius: 999px;
-  padding: 6px 18px;
+  padding: 8px 18px;
   box-shadow: var(--shadow-hover);
+  width: 100%;
 }
 
 .hero-search svg {
@@ -264,9 +265,11 @@ button:disabled {
 
 .hero-search input {
   flex: 1;
+  width: 100%;
   border: none;
   outline: none;
-  padding: 10px 0;
+  background: transparent;
+  padding: 4px 0;
   font-size: 0.95rem;
   color: var(--ink);
 }
