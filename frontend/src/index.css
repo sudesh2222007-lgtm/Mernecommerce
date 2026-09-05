@@ -253,14 +253,16 @@ button:disabled {
   align-items: center;
   gap: 12px;
   background: #fff;
+  border: 2px solid var(--navy);
   border-radius: 999px;
   padding: 12px 22px;
-  box-shadow: var(--shadow-hover);
+  box-shadow: 0 4px 16px rgba(16, 19, 28, 0.15);
   width: 100%;
 }
 
 .hero-search svg {
-  color: var(--muted);
+  color: var(--navy);
+  stroke-width: 2.5;
   flex-shrink: 0;
 }
 
@@ -272,7 +274,8 @@ button:disabled {
   background: transparent;
   padding: 4px 0;
   font-size: 1.05rem;
-  color: var(--ink);
+  font-weight: 600;
+  color: var(--navy);
 }
 
 .hero-search button {
