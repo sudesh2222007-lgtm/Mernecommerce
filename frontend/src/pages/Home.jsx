@@ -71,7 +71,7 @@ const Home = () => {
         <div className="hero-content">
           <span className="hero-eyebrow">New Season Arrivals</span>
           <form onSubmit={handleSearchSubmit} className="hero-search">
-            <Search size={18} />
+            <Search size={22} />
             <input
               type="text"
               placeholder="Search products..."

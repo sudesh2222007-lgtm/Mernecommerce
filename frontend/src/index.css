@@ -219,11 +219,11 @@ button:disabled {
 .hero {
   background: linear-gradient(135deg, var(--navy) 0%, var(--navy-soft) 100%);
   color: #fff;
-  padding: 14px 16px;
+  padding: 6px 16px 14px;
 }
 
 .hero-content {
-  max-width: 600px;
+  max-width: 720px;
   margin: 0 auto;
   text-align: center;
 }
@@ -239,6 +239,7 @@ button:disabled {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   margin-bottom: 6px;
+  margin-top: 0;
 }
 
 .hero p {
@@ -250,10 +251,10 @@ button:disabled {
 .hero-search {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   background: #fff;
   border-radius: 999px;
-  padding: 8px 18px;
+  padding: 12px 22px;
   box-shadow: var(--shadow-hover);
   width: 100%;
 }
@@ -270,7 +271,7 @@ button:disabled {
   outline: none;
   background: transparent;
   padding: 4px 0;
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   color: var(--ink);
 }
 
