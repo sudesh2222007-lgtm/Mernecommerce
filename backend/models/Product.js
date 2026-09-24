@@ -70,4 +70,8 @@ const productSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+productSchema.index({ user: 1 });
+productSchema.index({ category: 1, createdAt: -1 });
+productSchema.index({ name: "text" });
+
 module.exports = mongoose.model("Product", productSchema);

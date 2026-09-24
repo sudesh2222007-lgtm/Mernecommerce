@@ -112,12 +112,12 @@ const deleteMyProduct = async (req, res) => {
 // @access  Private/Seller
 const getSellerSummary = async (req, res) => {
   try {
-    const products = await Product.find({ user: req.user._id });
-    const totalProducts = products.length;
-    const outOfStock = products.filter((p) => p.countInStock === 0).length;
-    const lowStock = products.filter(
-      (p) => p.countInStock > 0 && p.countInStock <= 5
-    ).length;
+    const userId = req.user._id;
+    const [totalProducts, outOfStock, lowStock] = await Promise.all([
+      Product.countDocuments({ user: userId }),
+      Product.countDocuments({ user: userId, countInStock: 0 }),
+      Product.countDocuments({ user: userId, countInStock: { $gt: 0, $lte: 5 } }),
+    ]);
 
     res.json({
       totalProducts,

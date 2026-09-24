@@ -22,11 +22,14 @@ const getProducts = async (req, res) => {
 
     const filter = { ...keyword, ...category };
 
-    const totalFiltered = await Product.countDocuments(filter);
-    const products = await Product.find(filter)
-      .limit(pageSize)
-      .skip(pageSize * (page - 1))
-      .sort({ createdAt: -1 });
+    const [totalFiltered, products] = await Promise.all([
+      Product.countDocuments(filter),
+      Product.find(filter)
+        .limit(pageSize)
+        .skip(pageSize * (page - 1))
+        .sort({ createdAt: -1 })
+        .lean(),
+    ]);
 
     res.json({
       products,
