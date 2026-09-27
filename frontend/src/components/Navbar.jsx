@@ -1,91 +1,96 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { ShoppingBag, User, LogOut, PackageSearch, Store, Menu, X } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
-import { useCart } from "../context/CartContext";
+﻿import React, { useState } from " react\;
+import { Link, useNavigate } from \react-router-dom\;
+import { useAuth } from \../context/AuthContext\;
+import { useLanguage } from \../context/LanguageContext\;
 
-const Navbar = () => {
-  const { userInfo, logout } = useAuth();
-  const { cartItems } = useCart();
-  const navigate = useNavigate();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+export default function Navbar() {
+ const { user, logout } = useAuth();
+ const { lang, toggleLanguage } = useLanguage();
+ const navigate = useNavigate();
+ const [open, setOpen] = useState(false);
 
-  const totalQty = cartItems.reduce((acc, item) => acc + item.qty, 0);
+ const dashboardLink =
+ user?.role === \farmer\ ? \/farmer/dashboard\ : user?.role === \admin\ ? \/admin\ : \/products\;
 
-  const handleLogout = () => {
-    logout();
-    setMobileMenuOpen(false);
-    navigate("/login");
-  };
+ return (
+ <header className=\sticky top-0 z-40 bg-cream/90 backdrop-blur-glass border-b border-leaf-100\>
+ {/* Top Banner Language Selector Bar */}
+ <div className=\bg-leaf-900 text-white text-xs py-1.5 px-4 sm:px-6 flex items-center justify-between border-b border-leaf-800\>
+ <div className=\flex items-center gap-2 font-medium\>
+ <span className=\opacity-80\>🌾 Uzhavan Sandhai - Direct Farmer Market</span>
+ </div>
+ <div className=\flex items-center gap-1.5 bg-leaf-800/80 p-0.5 rounded-lg border border-leaf-700\>
+ <button
+ onClick={() => toggleLanguage(\ta\)}
+ className={px-2.5 py-0.5 rounded-md font-bold transition-all }
+ >
+ தமிழ்
+ </button>
+ <button
+ onClick={() => toggleLanguage(\en\)}
+ className={px-2.5 py-0.5 rounded-md font-bold transition-all }
+ >
+ English
+ </button>
+ </div>
+ </div>
 
-  return (
-    <header className="navbar">
-      <div className="navbar-inner">
-        <Link to="/" className="brand" onClick={() => setMobileMenuOpen(false)}>
-          <span className="brand-mark">N</span>
-          <span className="brand-name">Norra</span>
-        </Link>
+ <nav className=\max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16\>
+ <Link to=\/\ className=\flex items-center gap-2 font-display font-extrabold text-xl text-leaf-700\>
+ <span>🌾</span> {lang === \ta\ ? \உழவன் சந்தை\ : \Uzhavan Sandhai\}
+ </Link>
 
-        <div className="mobile-actions">
-          <Link to="/cart" className="nav-link cart-link mobile-cart-icon" onClick={() => setMobileMenuOpen(false)}>
-            <ShoppingBag size={22} />
-            {totalQty > 0 && <span className="cart-badge">{totalQty}</span>}
-          </Link>
-          <button
-            className="mobile-toggle-btn"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle navigation menu"
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
+ <div className=\hidden md:flex items-center gap-6 text-sm font-semibold text-leaf-900\>
+ <Link to=\/products\ className=\hover:text-leaf-600\>
+ {lang === \ta\ ? \பொருட்கள்\ : \Products\}
+ </Link>
+ <Link to=\/nearby-farmers\ className=\hover:text-leaf-600\>
+ {lang === \ta\ ? \அருகிலுள்ள விவசாயிகள்\ : \Nearby Farmers\}
+ </Link>
+ <Link to=\/customer-info\ className=\hover:text-leaf-600\>
+ {lang === \ta\ ? \வாடிக்கையாளர் மையம்\ : \Customer Hub\}
+ </Link>
+ {user?.role === \farmer\ && (
+ <Link to=\/farmer/info-center\ className=\hover:text-leaf-600\>
+ {lang === \ta\ ? \விவசாயி மையம்\ : \Farmer Hub\}
+ </Link>
+ )}
+ </div>
 
-        <nav className={`nav-links ${mobileMenuOpen ? "open" : ""}`}>
-          {userInfo && (
-            <Link to="/orders" className="nav-link" onClick={() => setMobileMenuOpen(false)}>
-              <PackageSearch size={18} />
-              <span>Orders</span>
-            </Link>
-          )}
+ <div className=\flex items-center gap-3\>
+ {user ? (
+ <>
+ <Link to={dashboardLink} className=\btn-secondary hidden sm:inline-block\>
+ {user.role === \farmer\ ? (lang === \ta\ ? \என் பண்ணை\ : \My Farm\) : user.role === admin ? (lang === ta ? அட்மின் : Admin) : (lang === ta ? என் ஆர்டர்கள் : My Orders)}
+ </Link>
+ <button
+ onClick={() => {
+ logout();
+ navigate(\/\);
+ }}
+ className=\btn-primary\
+ >
+ {lang === \ta\ ? \வெளியேறு\ : \Logout\}
+ </button>
+ </>
+ ) : (
+ <>
+ <Link to=\/login\ className=\btn-secondary\>{lang === \ta\ ? \உள்நுழை\ : \Login\}</Link>
+ <Link to=\/register\ className=\btn-primary hidden sm:inline-block\>{lang === \ta\ ? \பதிவு செய்\ : \Register\}</Link>
+ </>
+ )}
+ <button className=\md:hidden text-2xl\ onClick={() => setOpen(!open)} aria-label=\Menu\>☰</button>
+ </div>
+ </nav>
 
-          {userInfo && (userInfo.isSeller || userInfo.isAdmin) && (
-            <Link to="/seller" className="nav-link" onClick={() => setMobileMenuOpen(false)}>
-              <Store size={18} />
-              <span>Seller Dashboard</span>
-            </Link>
-          )}
-
-          <Link to="/cart" className="nav-link cart-link desktop-cart-link" onClick={() => setMobileMenuOpen(false)}>
-            <ShoppingBag size={18} />
-            <span>Cart</span>
-            {totalQty > 0 && <span className="cart-badge">{totalQty}</span>}
-          </Link>
-
-          {userInfo ? (
-            <div className="nav-user-group">
-              <span className="nav-user">
-                <User size={16} />
-                {userInfo.name.split(" ")[0]}
-              </span>
-              <button onClick={handleLogout} className="icon-btn" title="Logout">
-                <LogOut size={17} />
-              </button>
-            </div>
-          ) : (
-            <div className="nav-user-group">
-              <Link to="/login" className="nav-link" onClick={() => setMobileMenuOpen(false)}>
-                Sign In
-              </Link>
-              <Link to="/register" className="btn-pill" onClick={() => setMobileMenuOpen(false)}>
-                Sign Up
-              </Link>
-            </div>
-          )}
-        </nav>
-      </div>
-    </header>
-  );
-};
-
-export default Navbar;
-
+ {open && (
+ <div className=\md:hidden flex flex-col gap-3 px-4 pb-4 text-sm font-medium text-leaf-900\>
+ <Link to=\/products\ onClick={() => setOpen(false)}>{lang === \ta\ ? \பொருட்கள்\ : \Products\}</Link>
+ <Link to=\/nearby-farmers\ onClick={() => setOpen(false)}>{lang === \ta\ ? \அருகிலுள்ள விவசாயிகள்\ : \Nearby Farmers\}</Link>
+ <Link to=\/customer-info\ onClick={() => setOpen(false)}>{lang === \ta\ ? \வாடிக்கையாளர் மையம்\ : \Customer Hub\}</Link>
+ {!user && <Link to=\/register\ onClick={() => setOpen(false)}>{lang === \ta\ ? \பதிவு செய்\ : \Register\}</Link>}
+ </div>
+ )}
+ </header>
+ );
+}
