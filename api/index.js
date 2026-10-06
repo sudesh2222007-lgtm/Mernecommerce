@@ -1,32 +1,34 @@
 const express = require('express');
-const dotenv = require('dotenv');
 const cors = require('cors');
+const dotenv = require('dotenv');
 const connectDB = require('../backend/config/db');
 const authRoutes = require('../backend/routes/authRoutes');
 const productRoutes = require('../backend/routes/productRoutes');
 const orderRoutes = require('../backend/routes/orderRoutes');
 const { notFound, errorHandler } = require('../backend/middleware/errorHandler');
 
-dotenv.config();
-connectDB();
+dotenv.config({ path: '../backend/.env' });
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+let isConnected = false;
+const ensureDB = async () => {
+  if (!isConnected) {
+    try {
+      await connectDB();
+      isConnected = true;
+    } catch (err) {
+      console.error('MongoDB serverless connection error:', err.message);
+    }
   }
-  next();
-});
+};
 
-app.use(cors({
-  origin: true,
-  credentials: true,
-}));
+const app = express();
+app.use(cors());
 app.use(express.json());
 
+app.use(async (req, res, next) => {
+  await ensureDB();
+  next();
+});
 
 app.get('/api', (req, res) => {
   res.json({

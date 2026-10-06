@@ -6,139 +6,179 @@ import ProductModal from './components/ProductModal';
 import CartDrawer from './components/CartDrawer';
 import AuthModal from './components/AuthModal';
 import CheckoutModal from './components/CheckoutModal';
-import AdminPanel from './components/AdminPanel';
 import MyOrdersModal from './components/MyOrdersModal';
+import AdminPanel from './components/AdminPanel';
 import ToastNotification from './components/ToastNotification';
-import { fetchProducts, fetchCategories } from './services/api';
+import { fetchProducts } from './services/api';
 
-class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
+const DEFAULT_PRODUCTS = [
+  {
+    _id: '1',
+    name: 'Voyage Travel Backpack',
+    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80',
+    brand: 'Norra',
+    category: 'Accessories',
+    description: 'Durable water-resistant canvas and full-grain leather laptop backpack designed for daily travel and commutes.',
+    rating: 4.2,
+    numReviews: 19,
+    price: 24.99,
+    countInStock: 15,
+    featured: true,
+  },
+  {
+    _id: '2',
+    name: 'Horizon Polarized Sunglasses',
+    image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=800&q=80',
+    brand: 'Norra',
+    category: 'Accessories',
+    description: 'Classic matte black frame with UV400 polarized anti-glare lenses.',
+    rating: 4.5,
+    numReviews: 8,
+    price: 34.50,
+    countInStock: 25,
+    featured: true,
+  },
+  {
+    _id: '3',
+    name: 'Frame Mirrorless Camera',
+    image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80',
+    brand: 'Norra',
+    category: 'Electronics',
+    description: 'Full-frame mirrorless digital camera with 4K video capabilities and 24.2MP sensor.',
+    rating: 4.8,
+    numReviews: 41,
+    price: 549.00,
+    countInStock: 8,
+    featured: true,
+  },
+  {
+    _id: '4',
+    name: 'Boom Portable Speaker',
+    image: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=800&q=80',
+    brand: 'Norra',
+    category: 'Electronics',
+    description: 'IPX7 waterproof portable Bluetooth speaker with deep bass acoustic sound.',
+    rating: 4.4,
+    numReviews: 22,
+    price: 79.99,
+    countInStock: 30,
+    featured: false,
+  },
+  {
+    _id: '5',
+    name: 'Fold Leather Wallet',
+    image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=800&q=80',
+    brand: 'Norra',
+    category: 'Accessories',
+    description: 'Genuine slim bifold leather wallet with RFID blocking layer.',
+    rating: 4.3,
+    numReviews: 15,
+    price: 29.99,
+    countInStock: 20,
+    featured: false,
+  },
+  {
+    _id: '6',
+    name: 'Noise Canceling Studio Headphones',
+    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80',
+    brand: 'Norra',
+    category: 'Electronics',
+    description: 'Active noise-canceling wireless over-ear headphones with 30-hour battery power.',
+    rating: 4.9,
+    numReviews: 34,
+    price: 199.99,
+    countInStock: 12,
+    featured: true,
+  },
+  {
+    _id: '7',
+    name: 'Nike Flyknit Speed Running Shoes',
+    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80',
+    brand: 'Nike',
+    category: 'Footwear',
+    description: 'Lightweight breathable knitted mesh running shoes with responsive cushioning.',
+    rating: 4.7,
+    numReviews: 28,
+    price: 129.99,
+    countInStock: 18,
+    featured: true,
+  },
+  {
+    _id: '8',
+    name: 'Minimalist White Smartwatch',
+    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80',
+    brand: 'Norra',
+    category: 'Electronics',
+    description: 'Sleek white silicone smart wrist watch with heart rate and activity tracking.',
+    rating: 4.6,
+    numReviews: 17,
+    price: 149.00,
+    countInStock: 14,
+    featured: false,
+  },
+];
 
-  static getDerivedStateFromError(error) {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error, errorInfo) {
-    console.error('Uncaught React Error:', error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div style={{ padding: '4rem 2rem', textAlign: 'center', color: '#f8fafc', background: '#0b0f19', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <h1 style={{ fontSize: '2rem', marginBottom: '1rem', color: '#ef4444' }}>Something went wrong</h1>
-          <p style={{ color: '#94a3b8', maxWidth: '500px', marginBottom: '2rem' }}>
-            {this.state.error?.toString() || 'An unexpected rendering error occurred.'}
-          </p>
-          <button
-            onClick={() => window.location.reload()}
-            style={{ padding: '0.75rem 1.5rem', background: '#6366f1', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}
-          >
-            Reload Website
-          </button>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
-
-export default function AppWrapper() {
-  return (
-    <ErrorBoundary>
-      <MainApp />
-    </ErrorBoundary>
-  );
-}
-
-function MainApp() {
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState(['All']);
+export default function App() {
+  const [products, setProducts] = useState(DEFAULT_PRODUCTS);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
-
-  // User & Auth
-  const [user, setUser] = useState(null);
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
-
-  // Cart
   const [cart, setCart] = useState([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-
-  // Modals
   const [selectedProduct, setSelectedProduct] = useState(null);
+  
+  // User state
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem('user_info');
+    return saved ? JSON.parse(saved) : { name: 'Bhagya', email: 'bhagya@example.com', token: 'demo' };
+  });
+
+  // Modals & Drawers State
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isOrdersOpen, setIsOrdersOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [toasts, setToasts] = useState([]);
 
-  // Toast
-  const [toast, setToast] = useState(null);
+  const showToast = (message) => {
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, message }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 3500);
+  };
 
-  const showToast = (message, type = 'success') => {
-    setToast({ message, type });
+  const loadProducts = () => {
+    fetchProducts(selectedCategory, searchTerm)
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setProducts(data);
+        }
+      })
+      .catch((err) => {
+        console.log('Using default client products fallback:', err);
+      });
   };
 
   useEffect(() => {
     loadProducts();
-    loadCategories();
-    // Check saved user token session
-    const savedToken = localStorage.getItem('aura_token');
-    if (savedToken) {
-      fetch('/api/auth/profile', {
-        headers: { Authorization: `Bearer ${savedToken}` },
-      })
-        .then((res) => (res.ok ? res.json() : null))
-        .then((data) => {
-          if (data && data._id) setUser(data);
-        })
-        .catch(() => localStorage.removeItem('aura_token'));
-    }
   }, [selectedCategory, searchTerm]);
 
-  const loadProducts = async () => {
-    setLoading(true);
-    try {
-      const data = await fetchProducts(searchTerm, selectedCategory);
-      setProducts(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error(err);
-      setProducts([]);
-      showToast('Connecting to backend server...', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadCategories = async () => {
-    try {
-      const data = await fetchCategories();
-      setCategories(Array.isArray(data) ? data : ['All']);
-    } catch (err) {
-      console.error(err);
-      setCategories(['All']);
-    }
-  };
-
   const handleAddToCart = (product) => {
-    setCart((prev) => {
-      const existing = prev.find((item) => item._id === product._id);
-      if (existing) {
-        return prev.map((item) =>
+    setCart((prevCart) => {
+      const exists = prevCart.find((item) => item._id === product._id);
+      if (exists) {
+        return prevCart.map((item) =>
           item._id === product._id ? { ...item, qty: item.qty + 1 } : item
         );
       }
-      return [...prev, { ...product, qty: 1 }];
+      return [...prevCart, { ...product, qty: 1 }];
     });
-    showToast(`Added ${product.name} to cart!`, 'success');
+    showToast(`Added ${product.name} to cart 🛒`);
   };
 
-  const handleUpdateQty = (id, newQty) => {
+  const handleUpdateCartQty = (id, newQty) => {
     if (newQty <= 0) {
-      handleRemoveFromCart(id);
+      handleRemoveCartItem(id);
       return;
     }
     setCart((prev) =>
@@ -146,141 +186,105 @@ function MainApp() {
     );
   };
 
-  const handleRemoveFromCart = (id) => {
+  const handleRemoveCartItem = (id) => {
     setCart((prev) => prev.filter((item) => item._id !== id));
-    showToast('Item removed from cart', 'error');
+  };
+
+  const handleAuthSuccess = (userData) => {
+    setUser(userData);
+    localStorage.setItem('user_info', JSON.stringify(userData));
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('aura_token');
     setUser(null);
-    showToast('Signed out successfully', 'success');
+    localStorage.removeItem('user_info');
+    showToast('Signed out successfully.');
   };
 
-  const handleCheckoutTrigger = () => {
-    if (!user) {
-      setIsCartOpen(false);
-      setIsAuthOpen(true);
-      showToast('Please sign in to proceed with checkout', 'error');
-      return;
-    }
-    setIsCartOpen(false);
-    setIsCheckoutOpen(true);
-  };
-
-  const handleOrderSuccess = (order) => {
-    setCart([]);
-    setIsCheckoutOpen(false);
-  };
+  const categories = ['All', 'Electronics', 'Footwear', 'Accessories'];
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      
-      {/* Header Navigation */}
+    <div className="app-container">
       <Navbar
-        user={user}
-        cartCount={cart.reduce((acc, item) => acc + item.qty, 0)}
+        cartCount={cart.reduce((sum, item) => sum + item.qty, 0)}
         onOpenCart={() => setIsCartOpen(true)}
+        user={user}
         onOpenAuth={() => setIsAuthOpen(true)}
         onLogout={handleLogout}
         onOpenOrders={() => setIsOrdersOpen(true)}
         onOpenAdmin={() => setIsAdminOpen(true)}
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
       />
 
-      {/* Main Page Area */}
-      <main style={{ flex: 1 }}>
-        <Hero onExploreClick={() => {
-          document.getElementById('catalog-section')?.scrollIntoView({ behavior: 'smooth' });
-        }} />
+      <Hero
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        onSearchSubmit={loadProducts}
+      />
 
-        {/* Catalog Section */}
-        <section id="catalog-section" className="container" style={{ padding: '2rem 1.5rem 4rem 1.5rem' }}>
-          
-          {/* Category Filter Pills */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
-            <div>
-              <h2 style={{ fontSize: '1.75rem', fontWeight: 800 }}>Explore Products</h2>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Showing {products.length} handpicked premium items</p>
-            </div>
-
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`btn ${selectedCategory === cat ? 'btn-primary' : 'btn-secondary'}`}
-                  style={{ padding: '0.5rem 1.25rem', fontSize: '0.85rem', borderRadius: '30px' }}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Product Grid */}
-          {loading ? (
-            <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--text-muted)' }}>
-              <p style={{ fontSize: '1.1rem', fontWeight: 600 }}>Loading inventory from MongoDB backend...</p>
-            </div>
-          ) : products.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--text-muted)' }}>
-              <p style={{ fontSize: '1.2rem', fontWeight: 700 }}>No products found</p>
-              <span style={{ fontSize: '0.9rem' }}>Try clearing filters or search term.</span>
-            </div>
-          ) : (
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))',
-                gap: '1.75rem',
-              }}
+      <main className="main-content">
+        <div className="category-filter-bar">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              className={`cat-pill-btn ${selectedCategory === cat ? 'active' : ''}`}
+              onClick={() => setSelectedCategory(cat)}
             >
-              {products.map((product) => (
-                <ProductCard
-                  key={product._id}
-                  product={product}
-                  onQuickView={(p) => setSelectedProduct(p)}
-                  onAddToCart={handleAddToCart}
-                />
-              ))}
-            </div>
-          )}
+              {cat}
+            </button>
+          ))}
+        </div>
 
-        </section>
+        <div className="section-header">
+          <h2 className="section-title">
+            {selectedCategory === 'All' ? 'Featured Products' : `${selectedCategory} Collection`}
+          </h2>
+          <span className="section-item-count">{products.length} items</span>
+        </div>
+
+        <div className="product-grid">
+          {products.map((product) => (
+            <ProductCard
+              key={product._id}
+              product={product}
+              onAddToCart={handleAddToCart}
+              onSelectProduct={(p) => setSelectedProduct(p)}
+            />
+          ))}
+        </div>
       </main>
 
-      {/* Footer */}
-      <footer className="glass-panel" style={{ borderTop: '1px solid var(--border-color)', padding: '2.5rem 0', textAlign: 'center', marginTop: 'auto' }}>
-        <div className="container">
-          <p style={{ fontWeight: 700, fontSize: '1rem', marginBottom: '0.5rem' }}>AURA E-Commerce — Full MERN Stack Application</p>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-            Built with React, Vite, Node.js, Express.js, MongoDB Compass, Mongoose & REST API
-          </p>
-        </div>
+      <footer style={{ borderTop: '1px solid #e2e8f0', background: 'white', padding: '2.5rem', textAlign: 'center', color: '#64748b', fontSize: '0.9rem' }}>
+        <p>© 2026 Norra E-Commerce Platform. Built with Node.js, Express, MongoDB & React.</p>
       </footer>
 
-      {/* Interactive Modals & Drawers */}
+      {/* Drawers & Modals */}
+      <CartDrawer
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        cartItems={cart}
+        onUpdateQty={handleUpdateCartQty}
+        onRemoveItem={handleRemoveCartItem}
+        onProceedToCheckout={() => {
+          setIsCartOpen(false);
+          if (!user) {
+            setIsAuthOpen(true);
+            showToast('Please sign in to complete your checkout');
+          } else {
+            setIsCheckoutOpen(true);
+          }
+        }}
+      />
+
       <ProductModal
         product={selectedProduct}
         onClose={() => setSelectedProduct(null)}
         onAddToCart={handleAddToCart}
       />
 
-      <CartDrawer
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        cartItems={cart}
-        onUpdateQty={handleUpdateQty}
-        onRemoveItem={handleRemoveFromCart}
-        onCheckout={handleCheckoutTrigger}
-      />
-
       <AuthModal
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
-        onAuthSuccess={(userData) => setUser(userData)}
+        onAuthSuccess={handleAuthSuccess}
         showToast={showToast}
       />
 
@@ -289,26 +293,27 @@ function MainApp() {
         onClose={() => setIsCheckoutOpen(false)}
         cartItems={cart}
         user={user}
-        onOrderSuccess={handleOrderSuccess}
-        showToast={showToast}
-      />
-
-      <AdminPanel
-        isOpen={isAdminOpen}
-        onClose={() => setIsAdminOpen(false)}
-        products={products}
-        onRefreshProducts={loadProducts}
+        token={user?.token}
+        onOrderSuccess={() => setCart([])}
         showToast={showToast}
       />
 
       <MyOrdersModal
         isOpen={isOrdersOpen}
         onClose={() => setIsOrdersOpen(false)}
+        token={user?.token}
+      />
+
+      <AdminPanel
+        isOpen={isAdminOpen}
+        onClose={() => setIsAdminOpen(false)}
+        token={user?.token}
+        products={products}
+        onRefreshProducts={loadProducts}
         showToast={showToast}
       />
 
-      <ToastNotification toast={toast} onClose={() => setToast(null)} />
-
+      <ToastNotification toasts={toasts} />
     </div>
   );
 }

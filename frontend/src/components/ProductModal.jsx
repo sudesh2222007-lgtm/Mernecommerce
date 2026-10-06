@@ -1,138 +1,59 @@
 import React from 'react';
-import { X, Star, ShoppingBag, Truck, ShieldCheck } from 'lucide-react';
+import { X, Star, ShoppingBag, CheckCircle } from 'lucide-react';
 
 export default function ProductModal({ product, onClose, onAddToCart }) {
   if (!product) return null;
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(0, 0, 0, 0.8)',
-        backdropFilter: 'blur(8px)',
-        zIndex: 2000,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '1.5rem',
-      }}
-      onClick={onClose}
-    >
-      <div
-        className="glass-panel animate-fade-in"
-        style={{
-          width: '100%',
-          maxWidth: '850px',
-          borderRadius: 'var(--radius-lg)',
-          overflow: 'hidden',
-          position: 'relative',
-          display: 'grid',
-          gridTemplateColumns: '1fr 1.1fr',
-          border: '1px solid rgba(255, 255, 255, 0.15)',
-          boxShadow: '0 25px 50px rgba(0, 0, 0, 0.7)',
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          style={{
-            position: 'absolute',
-            top: '1rem',
-            right: '1rem',
-            zIndex: 10,
-            background: 'rgba(15, 23, 42, 0.8)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            color: 'white',
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-          }}
-        >
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '700px' }}>
+        <button className="btn-close" onClick={onClose}>
           <X size={18} />
         </button>
 
-        {/* Product Image Left */}
-        <div style={{ background: '#090d16', height: '100%', minHeight: '380px', position: 'relative' }}>
-          <img
-            src={product.image}
-            alt={product.name}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        </div>
-
-        {/* Details Right */}
-        <div style={{ padding: '2.5rem 2rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
           <div>
-            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
-              <span className="badge badge-primary">{product.category}</span>
-              <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Brand: {product.brand}</span>
+            <img
+              src={product.image}
+              alt={product.name}
+              style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '16px' }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <span className="card-category">{product.category}</span>
+            <h2 style={{ fontSize: '1.6rem', fontWeight: 800, margin: '0.5rem 0' }}>{product.name}</h2>
+            
+            <div className="card-rating" style={{ marginBottom: '1rem' }}>
+              <Star size={18} fill="#f59e0b" color="#f59e0b" />
+              <span>{product.rating} ({product.numReviews} customer reviews)</span>
             </div>
 
-            <h2 style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: '0.75rem', lineHeight: 1.2 }}>
-              {product.name}
-            </h2>
-
-            {/* Rating & Reviews */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.2rem' }}>
-              <div style={{ display: 'flex', gap: '2px' }}>
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    size={16}
-                    fill={i < Math.floor(product.rating) ? 'var(--gold)' : 'none'}
-                    color="var(--gold)"
-                  />
-                ))}
-              </div>
-              <span style={{ fontSize: '0.9rem', fontWeight: 700 }}>{product.rating}</span>
-              <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>({product.numReviews} customer reviews)</span>
-            </div>
-
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
               {product.description}
             </p>
 
-            {/* Stock status */}
-            <div style={{ marginBottom: '1.5rem' }}>
-              {product.countInStock > 0 ? (
-                <span className="badge badge-success">In Stock ({product.countInStock} available)</span>
-              ) : (
-                <span className="badge badge-warning">Out of Stock</span>
-              )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#10b981', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
+              <CheckCircle size={16} />
+              <span>In Stock ({product.countInStock} items remaining)</span>
             </div>
-          </div>
 
-          <div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', marginBottom: '1.5rem' }}>
-              <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-main)' }}>
-                ${product.price.toFixed(2)}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '1.8rem', fontWeight: 800, color: 'white' }}>
+                ₹{product.price.toLocaleString('en-IN')}
               </span>
-              <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Free Express Shipping</span>
+              <button
+                className="btn-primary"
+                onClick={() => {
+                  onAddToCart(product);
+                  onClose();
+                }}
+                style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+              >
+                <ShoppingBag size={18} /> Add to Shopping Cart
+              </button>
             </div>
-
-            <button
-              className="btn btn-primary"
-              style={{ width: '100%', padding: '0.9rem' }}
-              onClick={() => {
-                onAddToCart(product);
-                onClose();
-              }}
-              disabled={product.countInStock <= 0}
-            >
-              <ShoppingBag size={18} />
-              <span>Add to Cart</span>
-            </button>
           </div>
-
         </div>
       </div>
     </div>

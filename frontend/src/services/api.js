@@ -1,46 +1,20 @@
-const getApiBase = () => {
-  const envUrl = import.meta.env.VITE_API_URL;
-  if (!envUrl) return '/api';
-  const cleanUrl = envUrl.replace(/\/+$/, '');
-  return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
-};
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
-const API_BASE = getApiBase();
 
-export const getAuthHeaders = () => {
-  const token = localStorage.getItem('aura_token');
-  return {
-    'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
-};
+export const fetchProducts = async (category = 'All', keyword = '') => {
+  let url = `${API_BASE}/products?`;
+  if (category && category !== 'All') url += `category=${encodeURIComponent(category)}&`;
+  if (keyword) url += `keyword=${encodeURIComponent(keyword)}`;
 
-export const fetchProducts = async (keyword = '', category = 'All') => {
-  const params = new URLSearchParams();
-  if (keyword) params.append('keyword', keyword);
-  if (category && category !== 'All') params.append('category', category);
-
-  try {
-    const res = await fetch(`${API_BASE}/products?${params.toString()}`);
-    if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-    const data = await res.json();
-    return Array.isArray(data) ? data : [];
-  } catch (err) {
-    console.error('fetchProducts error:', err);
-    return [];
-  }
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Failed to fetch products');
+  return res.json();
 };
 
 export const fetchCategories = async () => {
-  try {
-    const res = await fetch(`${API_BASE}/products/categories/list`);
-    if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-    const data = await res.json();
-    return Array.isArray(data) ? data : ['All'];
-  } catch (err) {
-    console.error('fetchCategories error:', err);
-    return ['All'];
-  }
+  const res = await fetch(`${API_BASE}/products/categories`);
+  if (!res.ok) return ['Electronics', 'Fashion', 'Home & Living'];
+  return res.json();
 };
 
 export const loginApi = async (email, password) => {
@@ -65,30 +39,59 @@ export const registerApi = async (name, email, password) => {
   return data;
 };
 
-export const createOrderApi = async (orderData) => {
+export const createOrderApi = async (orderData, token) => {
   const res = await fetch(`${API_BASE}/orders`, {
     method: 'POST',
-    headers: getAuthHeaders(),
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
     body: JSON.stringify(orderData),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Order creation failed');
+  if (!res.ok) throw new Error(data.message || 'Failed to place order');
   return data;
 };
 
-export const fetchMyOrders = async () => {
+export const fetchMyOrdersApi = async (token) => {
   const res = await fetch(`${API_BASE}/orders/myorders`, {
-    headers: getAuthHeaders(),
+    headers: { Authorization: `Bearer ${token}` },
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Failed to fetch user orders');
+  if (!res.ok) throw new Error(data.message || 'Failed to fetch orders');
   return data;
 };
 
-export const createProductApi = async (productData) => {
+export const fetchAllOrdersApi = async (token) => {
+  const res = await fetch(`${API_BASE}/orders`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Failed to fetch all orders');
+  return data;
+};
+
+export const updateOrderStatusApi = async (orderId, status, token) => {
+  const res = await fetch(`${API_BASE}/orders/${orderId}/status`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ status }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Failed to update order status');
+  return data;
+};
+
+export const createProductApi = async (productData, token) => {
   const res = await fetch(`${API_BASE}/products`, {
     method: 'POST',
-    headers: getAuthHeaders(),
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
     body: JSON.stringify(productData),
   });
   const data = await res.json();
@@ -96,32 +99,12 @@ export const createProductApi = async (productData) => {
   return data;
 };
 
-export const deleteProductApi = async (id) => {
-  const res = await fetch(`${API_BASE}/products/${id}`, {
+export const deleteProductApi = async (productId, token) => {
+  const res = await fetch(`${API_BASE}/products/${productId}`, {
     method: 'DELETE',
-    headers: getAuthHeaders(),
+    headers: { Authorization: `Bearer ${token}` },
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || 'Failed to delete product');
-  return data;
-};
-
-export const fetchAllOrdersAdmin = async () => {
-  const res = await fetch(`${API_BASE}/orders`, {
-    headers: getAuthHeaders(),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Failed to fetch all orders');
-  return data;
-};
-
-export const updateOrderStatusApi = async (id, status) => {
-  const res = await fetch(`${API_BASE}/orders/${id}/status`, {
-    method: 'PUT',
-    headers: getAuthHeaders(),
-    body: JSON.stringify({ status }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.message || 'Failed to update order status');
   return data;
 };

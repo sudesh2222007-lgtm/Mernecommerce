@@ -8,172 +8,138 @@ dotenv.config();
 
 const sampleProducts = [
   {
-    name: 'Aura Studio Wireless Headphones',
-    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80',
-    brand: 'Aura',
-    category: 'Electronics',
-    description: 'Immersive noise cancelling spatial sound audio with ultra lightweight ergonomic leather cushions and 40-hour battery life.',
-    rating: 4.9,
-    numReviews: 24,
-    price: 249.99,
+    name: 'Voyage Travel Backpack',
+    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80',
+    brand: 'Norra',
+    category: 'Accessories',
+    description: 'Durable water-resistant canvas and full-grain leather laptop backpack designed for daily travel and commutes.',
+    rating: 4.2,
+    numReviews: 19,
+    price: 24.99,
     countInStock: 15,
     featured: true,
   },
   {
-    name: 'Luminary Ultra Smart Watch Series X',
-    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80',
-    brand: 'Luminary',
+    name: 'Horizon Polarized Sunglasses',
+    image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=800&q=80',
+    brand: 'Norra',
+    category: 'Accessories',
+    description: 'Classic matte black frame with UV400 polarized anti-glare lenses.',
+    rating: 4.5,
+    numReviews: 8,
+    price: 34.50,
+    countInStock: 25,
+    featured: true,
+  },
+  {
+    name: 'Frame Mirrorless Camera',
+    image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80',
+    brand: 'Norra',
     category: 'Electronics',
-    description: 'AMOLED Retina curved display, real-time heart rate, blood oxygen monitor, GPS tracking, and titanium casing.',
+    description: 'Full-frame mirrorless digital camera with 4K video capabilities and 24.2MP sensor.',
     rating: 4.8,
-    numReviews: 18,
-    price: 329.00,
+    numReviews: 41,
+    price: 549.00,
     countInStock: 8,
     featured: true,
   },
   {
-    name: 'Minimalist Artisan Leather Backpack',
-    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80',
-    brand: 'Vogue Craft',
-    category: 'Fashion',
-    description: 'Handcrafted full-grain Italian leather roll-top backpack featuring laptop compartment and weather resistance.',
-    rating: 4.7,
-    numReviews: 12,
-    price: 189.50,
-    countInStock: 20,
-    featured: true,
-  },
-  {
-    name: 'ProShot 4K Cinema Lens Vlog Camera',
-    image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80',
-    brand: 'OpticPro',
+    name: 'Boom Portable Speaker',
+    image: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=800&q=80',
+    brand: 'Norra',
     category: 'Electronics',
-    description: 'Compact mirrorless 4K camera with interchangeable optical lenses, flip-out touchscreen, and studio mic bundle.',
-    rating: 4.9,
-    numReviews: 31,
-    price: 899.00,
-    countInStock: 5,
-    featured: true,
-  },
-  {
-    name: 'Urban Streetwear Oversized Hoodie',
-    image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80',
-    brand: 'Vogue Craft',
-    category: 'Fashion',
-    description: 'Heavyweight organic cotton fleece blend with drop shoulders, kangaroo pocket, and premium embroidered logo.',
-    rating: 4.6,
-    numReviews: 45,
-    price: 75.00,
+    description: 'IPX7 waterproof portable Bluetooth speaker with deep bass acoustic sound.',
+    rating: 4.4,
+    numReviews: 22,
+    price: 79.99,
     countInStock: 30,
     featured: false,
   },
   {
-    name: 'Nordic Wood Ceramic Coffee Maker Set',
-    image: 'https://images.unsplash.com/photo-1517668808822-9ebe02f2a6e8?auto=format&fit=crop&w=800&q=80',
-    brand: 'HomeHaven',
-    category: 'Home & Living',
-    description: 'Pour-over precision coffee dripper set crafted with matte white ceramic and natural oak wood stand.',
-    rating: 4.8,
+    name: 'Fold Leather Wallet',
+    image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=800&q=80',
+    brand: 'Norra',
+    category: 'Accessories',
+    description: 'Genuine slim bifold leather wallet with RFID blocking layer.',
+    rating: 4.3,
     numReviews: 15,
-    price: 64.99,
-    countInStock: 22,
+    price: 29.99,
+    countInStock: 20,
     featured: false,
   },
   {
-    name: 'Mechanical RGB Mechanical Gaming Keyboard',
-    image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80',
-    brand: 'Aura',
+    name: 'Noise Canceling Studio Headphones',
+    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80',
+    brand: 'Norra',
     category: 'Electronics',
-    description: 'Tactile hot-swappable mechanical switches, custom PBT keycaps, per-key RGB backlighting, and aluminum chassis.',
-    rating: 4.7,
-    numReviews: 29,
-    price: 139.99,
+    description: 'Active noise-canceling wireless over-ear headphones with 30-hour battery power.',
+    rating: 4.9,
+    numReviews: 34,
+    price: 199.99,
     countInStock: 12,
-    featured: false,
+    featured: true,
   },
   {
-    name: 'Modern Ergonomic Office Chair',
-    image: 'https://images.unsplash.com/photo-1580481072645-022f9a6d83d0?auto=format&fit=crop&w=800&q=80',
-    brand: 'HomeHaven',
-    category: 'Home & Living',
-    description: 'Breathable 3D mesh lumbar support ergonomic desk chair with 4D adjustable armrests and smooth recline.',
-    rating: 4.9,
-    numReviews: 40,
-    price: 299.00,
-    countInStock: 7,
+    name: 'Nike Flyknit Speed Running Shoes',
+    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80',
+    brand: 'Nike',
+    category: 'Footwear',
+    description: 'Lightweight breathable knitted mesh running shoes with responsive cushioning.',
+    rating: 4.7,
+    numReviews: 28,
+    price: 129.99,
+    countInStock: 18,
+    featured: true,
+  },
+  {
+    name: 'Minimalist White Smartwatch',
+    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80',
+    brand: 'Norra',
+    category: 'Electronics',
+    description: 'Sleek white silicone smart wrist watch with heart rate and activity tracking.',
+    rating: 4.6,
+    numReviews: 17,
+    price: 149.00,
+    countInStock: 14,
     featured: false,
-  }
+  },
 ];
 
-const seedData = async () => {
+const importData = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/ecommerce_db');
-    console.log('Connected to MongoDB for seeding...');
 
-    await User.deleteMany();
-    await Product.deleteMany();
     await Order.deleteMany();
+    await Product.deleteMany();
+    await User.deleteMany();
 
-    console.log('Cleared old database collections.');
-
-    // Seed Admin and Demo User
-    const adminUser = await User.create({
-      name: 'Admin User',
+    const createdAdmin = await User.create({
+      name: 'Bhagya Admin',
       email: 'admin@example.com',
       password: 'adminpassword123',
       isAdmin: true,
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
     });
 
-    const demoUser = await User.create({
-      name: 'John Doe',
-      email: 'user@example.com',
-      password: 'userpassword123',
+    await User.create({
+      name: 'Bhagya User',
+      email: 'customer@example.com',
+      password: 'customerpassword123',
       isAdmin: false,
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80',
     });
 
-    console.log('Created Users:');
-    console.log('  Admin Account: admin@example.com / adminpassword123');
-    console.log('  Customer Account: user@example.com / userpassword123');
+    const sampleProductsWithAdmin = sampleProducts.map((p) => ({
+      ...p,
+      user: createdAdmin._id,
+    }));
 
-    const createdProducts = await Product.insertMany(sampleProducts);
-    console.log(`Successfully seeded ${createdProducts.length} products!`);
+    await Product.insertMany(sampleProductsWithAdmin);
 
-    // Create a demo order
-    await Order.create({
-      user: demoUser._id,
-      orderItems: [
-        {
-          name: createdProducts[0].name,
-          qty: 1,
-          image: createdProducts[0].image,
-          price: createdProducts[0].price,
-          product: createdProducts[0]._id,
-        },
-      ],
-      shippingAddress: {
-        address: '123 Tech Street',
-        city: 'Silicon City',
-        postalCode: '10001',
-        country: 'United States',
-      },
-      paymentMethod: 'Credit Card / UPI',
-      taxPrice: 25.0,
-      shippingPrice: 0.0,
-      totalPrice: createdProducts[0].price + 25.0,
-      isPaid: true,
-      paidAt: Date.now(),
-      status: 'Shipped',
-    });
-
-    console.log('Created demo order.');
-    console.log('Seed completed successfully!');
-    process.exit(0);
+    console.log('✅ Data Seeded into MongoDB Compass with Norra products!');
+    process.exit();
   } catch (error) {
-    console.error(`Seeding error: ${error.message}`);
+    console.error(`❌ Seeding Error: ${error.message}`);
     process.exit(1);
   }
 };
 
-seedData();
+importData();

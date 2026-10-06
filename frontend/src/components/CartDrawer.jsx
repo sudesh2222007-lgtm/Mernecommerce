@@ -7,165 +7,106 @@ export default function CartDrawer({
   cartItems,
   onUpdateQty,
   onRemoveItem,
-  onCheckout,
+  onProceedToCheckout,
 }) {
   if (!isOpen) return null;
 
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
+  const total = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(0, 0, 0, 0.7)',
-        backdropFilter: 'blur(6px)',
-        zIndex: 3000,
-        display: 'flex',
-        justifyContent: 'flex-end',
-      }}
-      onClick={onClose}
-    >
-      <div
-        className="glass-panel animate-fade-in"
-        style={{
-          width: '100%',
-          maxWidth: '420px',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          borderLeft: '1px solid rgba(255, 255, 255, 0.1)',
-          background: '#0d1322',
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div
-          style={{
-            padding: '1.5rem',
-            borderBottom: '1px solid var(--border-color)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+    <div className="drawer-overlay" onClick={onClose}>
+      <div className="drawer" onClick={(e) => e.stopPropagation()}>
+        <div className="drawer-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <ShoppingBag size={20} color="var(--primary)" />
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>Shopping Cart</h3>
-            <span className="badge badge-primary">{cartItems.length} items</span>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Your Shopping Cart</h2>
           </div>
-          <button
-            onClick={onClose}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--text-muted)',
-              cursor: 'pointer',
-            }}
-          >
-            <X size={20} />
+          <button className="btn-close" onClick={onClose}>
+            <X size={18} />
           </button>
         </div>
 
-        {/* Items List */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem' }}>
+        <div className="drawer-items">
           {cartItems.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-muted)' }}>
               <ShoppingBag size={48} style={{ opacity: 0.3, marginBottom: '1rem' }} />
-              <p style={{ fontWeight: 600 }}>Your cart is empty</p>
-              <span style={{ fontSize: '0.85rem' }}>Add some products to get started!</span>
+              <p>Your shopping cart is currently empty.</p>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              {cartItems.map((item) => (
-                <div
-                  key={item._id}
-                  style={{
-                    display: 'flex',
-                    gap: '1rem',
-                    padding: '0.85rem',
-                    borderRadius: 'var(--radius-md)',
-                    background: 'rgba(255, 255, 255, 0.03)',
-                    border: '1px solid var(--border-color)',
-                  }}
-                >
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    style={{ width: '70px', height: '70px', borderRadius: 'var(--radius-sm)', objectFit: 'cover' }}
-                  />
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    <div>
-                      <h4 style={{ fontSize: '0.9rem', fontWeight: 700, lineHeight: 1.2, marginBottom: '0.2rem' }}>
-                        {item.name}
-                      </h4>
-                      <span style={{ fontSize: '0.85rem', color: '#818cf8', fontWeight: 700 }}>
-                        ${item.price.toFixed(2)}
-                      </span>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.5rem' }}>
-                      {/* Qty controls */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(0,0,0,0.4)', borderRadius: '6px', padding: '2px 6px' }}>
-                        <button
-                          onClick={() => onUpdateQty(item._id, item.qty - 1)}
-                          style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', display: 'flex' }}
-                        >
-                          <Minus size={14} />
-                        </button>
-                        <span style={{ fontSize: '0.85rem', fontWeight: 700, minWidth: '16px', textAlign: 'center' }}>{item.qty}</span>
-                        <button
-                          onClick={() => onUpdateQty(item._id, item.qty + 1)}
-                          style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', display: 'flex' }}
-                        >
-                          <Plus size={14} />
-                        </button>
-                      </div>
-
-                      <button
-                        onClick={() => onRemoveItem(item._id)}
-                        style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', display: 'flex' }}
-                        title="Remove"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
+            cartItems.map((item) => (
+              <div key={item._id} className="cart-item-row">
+                <img src={item.image} alt={item.name} className="cart-item-img" />
+                <div style={{ flex: 1 }}>
+                  <h4 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: '0.25rem' }}>{item.name}</h4>
+                  <div style={{ color: '#0f172a', fontWeight: 800, fontSize: '0.95rem' }}>
+                    ₹{item.price.toLocaleString('en-IN')}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+                    <button
+                      onClick={() => onUpdateQty(item._id, item.qty - 1)}
+                      style={{
+                        background: '#f1f5f9',
+                        border: 'none',
+                        color: '#0f172a',
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <Minus size={12} />
+                    </button>
+                    <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{item.qty}</span>
+                    <button
+                      onClick={() => onUpdateQty(item._id, item.qty + 1)}
+                      style={{
+                        background: '#f1f5f9',
+                        border: 'none',
+                        color: '#0f172a',
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <Plus size={12} />
+                    </button>
                   </div>
                 </div>
-              ))}
-            </div>
+                <button
+                  onClick={() => onRemoveItem(item._id)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#ef4444',
+                    cursor: 'pointer',
+                    padding: '0.5rem',
+                  }}
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
+            ))
           )}
         </div>
 
-        {/* Footer Checkout Summary */}
         {cartItems.length > 0 && (
-          <div
-            style={{
-              padding: '1.5rem',
-              borderTop: '1px solid var(--border-color)',
-              background: 'rgba(15, 23, 42, 0.95)',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>
-              <span>Subtotal</span>
-              <span>${subtotal.toFixed(2)}</span>
+          <div className="drawer-footer" style={{ borderTop: '1px solid #e2e8f0', paddingTop: '1.25rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+              <span style={{ color: 'var(--text-muted)' }}>Subtotal</span>
+              <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a' }}>
+                ₹{total.toLocaleString('en-IN')}
+              </span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.25rem', fontSize: '1.1rem', fontWeight: 800 }}>
-              <span>Total</span>
-              <span style={{ color: '#34d399' }}>${subtotal.toFixed(2)}</span>
-            </div>
-
-            <button className="btn btn-primary" style={{ width: '100%', padding: '0.85rem' }} onClick={onCheckout}>
-              <span>Proceed to Checkout</span>
-              <ArrowRight size={18} />
+            <button
+              className="btn-primary-black"
+              style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
+              onClick={onProceedToCheckout}
+            >
+              Proceed to Checkout <ArrowRight size={18} />
             </button>
           </div>
         )}
-
       </div>
     </div>
   );

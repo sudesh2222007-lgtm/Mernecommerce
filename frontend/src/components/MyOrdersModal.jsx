@@ -1,129 +1,101 @@
 import React, { useEffect, useState } from 'react';
-import { X, PackageCheck, Clock, CheckCircle2, Truck } from 'lucide-react';
-import { fetchMyOrders } from '../services/api';
+import { X, Package } from 'lucide-react';
+import { fetchMyOrdersApi } from '../services/api';
 
-export default function MyOrdersModal({ isOpen, onClose, showToast }) {
+export default function MyOrdersModal({ isOpen, onClose, token }) {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (isOpen) {
-      loadOrders();
+    if (isOpen && token) {
+      setLoading(true);
+      fetchMyOrdersApi(token)
+        .then((data) => setOrders(data))
+        .catch((err) => console.error(err))
+        .finally(() => setLoading(false));
     }
-  }, [isOpen]);
-
-  const loadOrders = async () => {
-    setLoading(true);
-    try {
-      const data = await fetchMyOrders();
-      setOrders(data);
-    } catch (err) {
-      showToast(err.message || 'Failed to load orders', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [isOpen, token]);
 
   if (!isOpen) return null;
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(0, 0, 0, 0.8)',
-        backdropFilter: 'blur(8px)',
-        zIndex: 4000,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '1.5rem',
-      }}
-      onClick={onClose}
-    >
-      <div
-        className="glass-panel animate-fade-in"
-        style={{
-          width: '100%',
-          maxWidth: '700px',
-          maxHeight: '85vh',
-          borderRadius: 'var(--radius-lg)',
-          overflow: 'hidden',
-          position: 'relative',
-          display: 'flex',
-          flexDirection: 'column',
-          border: '1px solid rgba(255, 255, 255, 0.15)',
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <PackageCheck size={22} color="var(--primary)" />
-            <h3 style={{ fontSize: '1.3rem', fontWeight: 800 }}>My Order History</h3>
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '750px', maxHeight: '85vh', overflowY: 'auto' }}>
+        <button className="btn-close" onClick={onClose}>
+          <X size={18} />
+        </button>
+
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '0.5rem' }}>My Order History</h2>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+          Track and review all your previous purchases.
+        </p>
+
+        {loading ? (
+          <p style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>Loading your orders...</p>
+        ) : orders.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
+            <Package size={48} style={{ opacity: 0.3, marginBottom: '1rem' }} />
+            <p>You have not placed any orders yet.</p>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
-            <X size={20} />
-          </button>
-        </div>
-
-        {/* Content */}
-        <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
-          {loading ? (
-            <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem' }}>Loading order history...</p>
-          ) : orders.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
-              <PackageCheck size={48} style={{ opacity: 0.3, marginBottom: '1rem' }} />
-              <p style={{ fontWeight: 600 }}>No orders placed yet</p>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              {orders.map((order) => (
-                <div
-                  key={order._id}
-                  style={{
-                    padding: '1.25rem',
-                    borderRadius: 'var(--radius-md)',
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid var(--border-color)',
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.6rem' }}>
-                    <div>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>Order ID: #{order._id.slice(-8).toUpperCase()}</span>
-                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{new Date(order.createdAt).toLocaleDateString()}</span>
-                    </div>
-
-                    <div>
-                      <span className={`badge ${order.status === 'Delivered' ? 'badge-success' : 'badge-warning'}`}>
-                        {order.status}
-                      </span>
-                    </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {orders.map((order) => (
+              <div
+                key={order._id}
+                style={{
+                  background: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '16px',
+                  padding: '1.25rem',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem' }}>
+                  <div>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>ORDER ID</span>
+                    <h4 style={{ fontSize: '0.9rem', fontWeight: 700 }}>#{order._id}</h4>
                   </div>
-
-                  {/* Items */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '0.75rem' }}>
-                    {order.orderItems.map((item, idx) => (
-                      <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.9rem' }}>
-                        <img src={item.image} alt={item.name} style={{ width: '36px', height: '36px', borderRadius: '6px', objectFit: 'cover' }} />
-                        <span style={{ flex: 1, color: 'var(--text-main)', fontWeight: 600 }}>{item.qty}x {item.name}</span>
-                        <span style={{ color: '#818cf8', fontWeight: 700 }}>${(item.price * item.qty).toFixed(2)}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px dashed var(--border-color)', paddingTop: '0.6rem', fontSize: '0.9rem' }}>
-                    <span style={{ color: 'var(--text-muted)' }}>Payment: {order.paymentMethod}</span>
-                    <span style={{ fontWeight: 800, color: '#34d399', fontSize: '1.05rem' }}>Total: ${order.totalPrice.toFixed(2)}</span>
+                  <div style={{ textAlign: 'right' }}>
+                    <span
+                      style={{
+                        padding: '0.25rem 0.65rem',
+                        borderRadius: '999px',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        background: order.status === 'Delivered' ? '#dcfce7' : '#f1f5f9',
+                        color: order.status === 'Delivered' ? '#15803d' : '#0f172a',
+                        border: `1px solid ${order.status === 'Delivered' ? '#86efac' : '#cbd5e1'}`,
+                      }}
+                    >
+                      {order.status}
+                    </span>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                  {order.orderItems.map((item, idx) => (
+                    <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <img src={item.image} alt={item.name} style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover' }} />
+                      <div style={{ flex: 1, fontSize: '0.85rem' }}>
+                        <span style={{ fontWeight: 600 }}>{item.name}</span>
+                        <span style={{ color: 'var(--text-muted)', marginLeft: '0.5rem' }}>x{item.qty}</span>
+                      </div>
+                      <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>₹{(item.price * item.qty).toLocaleString('en-IN')}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #e2e8f0', paddingTop: '0.5rem', fontSize: '0.85rem' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>
+                    Placed on: {new Date(order.createdAt).toLocaleDateString()}
+                  </span>
+                  <span style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a' }}>
+                    Total: ₹{order.totalPrice.toLocaleString('en-IN')}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

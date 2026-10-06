@@ -1,6 +1,6 @@
 const Product = require('../models/Product');
 
-// @desc    Fetch all products with search & category filters
+// @desc    Fetch all products with optional search & category filtering
 // @route   GET /api/products
 // @access  Public
 const getProducts = async (req, res) => {
@@ -37,17 +37,17 @@ const getProductById = async (req, res) => {
       res.status(404).json({ message: 'Product not found' });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Invalid product ID' });
   }
 };
 
-// @desc    Get product categories list
-// @route   GET /api/products/categories/list
+// @desc    Get product categories
+// @route   GET /api/products/categories
 // @access  Public
 const getCategories = async (req, res) => {
   try {
-    const categories = await Product.distinct('category');
-    res.json(['All', ...categories]);
+    const categories = await Product.find().distinct('category');
+    res.json(categories);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -58,52 +58,22 @@ const getCategories = async (req, res) => {
 // @access  Private/Admin
 const createProduct = async (req, res) => {
   try {
-    const { name, price, description, image, brand, category, countInStock, featured } = req.body;
+    const { name, price, description, image, brand, category, countInStock } = req.body;
 
     const product = new Product({
       name: name || 'Sample Product',
       price: price || 0,
-      description: description || 'Sample Description',
-      image: image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80',
-      brand: brand || 'Sample Brand',
+      user: req.user._id,
+      image: image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80',
+      brand: brand || 'Generic',
       category: category || 'Electronics',
       countInStock: countInStock || 10,
-      rating: 4.5,
-      numReviews: 1,
-      featured: featured || false,
+      numReviews: 0,
+      description: description || 'Sample product description',
     });
 
     const createdProduct = await product.save();
     res.status(201).json(createdProduct);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// @desc    Update a product (Admin only)
-// @route   PUT /api/products/:id
-// @access  Private/Admin
-const updateProduct = async (req, res) => {
-  try {
-    const { name, price, description, image, brand, category, countInStock, featured } = req.body;
-
-    const product = await Product.findById(req.params.id);
-
-    if (product) {
-      product.name = name || product.name;
-      product.price = price !== undefined ? price : product.price;
-      product.description = description || product.description;
-      product.image = image || product.image;
-      product.brand = brand || product.brand;
-      product.category = category || product.category;
-      product.countInStock = countInStock !== undefined ? countInStock : product.countInStock;
-      product.featured = featured !== undefined ? featured : product.featured;
-
-      const updatedProduct = await product.save();
-      res.json(updatedProduct);
-    } else {
-      res.status(404).json({ message: 'Product not found' });
-    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -115,7 +85,6 @@ const updateProduct = async (req, res) => {
 const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-
     if (product) {
       await product.deleteOne();
       res.json({ message: 'Product removed successfully' });
@@ -132,6 +101,5 @@ module.exports = {
   getProductById,
   getCategories,
   createProduct,
-  updateProduct,
   deleteProduct,
 };

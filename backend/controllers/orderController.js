@@ -3,7 +3,7 @@ const Order = require('../models/Order');
 // @desc    Create new order
 // @route   POST /api/orders
 // @access  Private
-const createOrder = async (req, res) => {
+const addOrderItems = async (req, res) => {
   try {
     const {
       orderItems,
@@ -23,10 +23,11 @@ const createOrder = async (req, res) => {
       orderItems,
       user: req.user._id,
       shippingAddress,
-      paymentMethod: paymentMethod || 'Credit Card / UPI',
-      taxPrice: taxPrice || 0,
-      shippingPrice: shippingPrice || 0,
-      totalPrice: totalPrice || 0,
+      paymentMethod,
+      itemsPrice,
+      taxPrice,
+      shippingPrice,
+      totalPrice,
       isPaid: true,
       paidAt: Date.now(),
       status: 'Processing',
@@ -51,26 +52,10 @@ const getMyOrders = async (req, res) => {
   }
 };
 
-// @desc    Get order by ID
-// @route   GET /api/orders/:id
-// @access  Private
-const getOrderById = async (req, res) => {
-  try {
-    const order = await Order.findById(req.params.id).populate('user', 'name email');
-    if (order) {
-      res.json(order);
-    } else {
-      res.status(404).json({ message: 'Order not found' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
 // @desc    Get all orders (Admin only)
 // @route   GET /api/orders
 // @access  Private/Admin
-const getAllOrders = async (req, res) => {
+const getOrders = async (req, res) => {
   try {
     const orders = await Order.find({}).populate('user', 'id name email').sort({ createdAt: -1 });
     res.json(orders);
@@ -93,7 +78,6 @@ const updateOrderStatus = async (req, res) => {
         order.isDelivered = true;
         order.deliveredAt = Date.now();
       }
-
       const updatedOrder = await order.save();
       res.json(updatedOrder);
     } else {
@@ -105,9 +89,8 @@ const updateOrderStatus = async (req, res) => {
 };
 
 module.exports = {
-  createOrder,
+  addOrderItems,
   getMyOrders,
-  getOrderById,
-  getAllOrders,
+  getOrders,
   updateOrderStatus,
 };
