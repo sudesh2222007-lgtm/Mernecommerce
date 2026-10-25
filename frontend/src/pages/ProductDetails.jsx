@@ -47,7 +47,15 @@ const ProductDetails = () => {
 
       <div className="product-details">
         <div className="details-media">
-          <img src={product.image} alt={product.name} />
+          <img
+            src={product.image}
+            alt={product.name}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src =
+                "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=800&q=80";
+            }}
+          />
         </div>
 
         <div className="details-info">
@@ -90,13 +98,15 @@ const ProductDetails = () => {
             <div className="qty-selector">
               <label>Quantity</label>
               <select value={qty} onChange={(e) => setQty(e.target.value)}>
-                {[...Array(Math.min(product.countInStock, 10)).keys()].map(
-                  (x) => (
-                    <option key={x + 1} value={x + 1}>
-                      {x + 1}
-                    </option>
-                  )
-                )}
+                {[
+                  ...Array(
+                    Math.max(1, Math.min(Math.floor(product.countInStock || 0), 10))
+                  ).keys(),
+                ].map((x) => (
+                  <option key={x + 1} value={x + 1}>
+                    {x + 1}
+                  </option>
+                ))}
               </select>
             </div>
           )}

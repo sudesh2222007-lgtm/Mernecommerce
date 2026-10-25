@@ -11,17 +11,29 @@ const ProductCard = memo(({ product }) => {
 
   const handleQuickAdd = (e) => {
     e.preventDefault();
+    e.stopPropagation();
     addToCart(product, 1);
   };
 
   return (
     <div className="product-card">
       <Link to={`/product/${product._id}`} className="product-card-media">
-        <img src={product.image} alt={product.name} loading="lazy" decoding="async" />
+        <img
+          src={product.image}
+          alt={product.name}
+          loading="lazy"
+          decoding="async"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src =
+              "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=800&q=80";
+          }}
+        />
         <span className="product-card-category">{product.category}</span>
         {off > 0 && <span className="discount-ribbon">{off}% OFF</span>}
         {product.countInStock > 0 && (
           <button
+            type="button"
             className="quick-add-btn"
             onClick={handleQuickAdd}
             title="Add to cart"

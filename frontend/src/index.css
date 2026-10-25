@@ -255,7 +255,7 @@ button:disabled {
   box-shadow: var(--shadow-hover);
 }
 
-.hero-search svg {
+.hero-search svg.search-lead-icon {
   color: var(--muted);
   flex-shrink: 0;
 }
@@ -269,18 +269,38 @@ button:disabled {
   color: var(--ink);
 }
 
-.hero-search button {
+.hero-search button,
+.hero-search button[type="submit"],
+.hero-search-btn {
   background: var(--coral);
   color: #fff;
   border: none;
-  padding: 10px 22px;
-  border-radius: 999px;
-  font-weight: 600;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  padding: 0;
+  border-radius: 50% !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 4px 12px rgba(255, 90, 60, 0.35);
 }
 
-.hero-search button:hover {
+.hero-search button svg,
+.hero-search-btn svg {
+  color: #fff;
+  stroke: #fff;
+}
+
+.hero-search button:hover,
+.hero-search button[type="submit"]:hover,
+.hero-search-btn:hover {
   background: var(--coral-dark);
+  transform: scale(1.06);
+  box-shadow: 0 6px 16px rgba(255, 90, 60, 0.45);
 }
 
 /* ============ Category pills ============ */
@@ -323,8 +343,8 @@ button:disabled {
 /* ============ Product Grid / Card ============ */
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
   width: 100%;
 }
 
@@ -347,7 +367,7 @@ button:disabled {
   position: relative;
   display: block;
   text-decoration: none;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
   background: #eee;
 }
@@ -1007,8 +1027,8 @@ html, body {
 
 @media (max-width: 1024px) and (min-width: 769px) {
   .product-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
   }
 }
 
@@ -1020,6 +1040,10 @@ html, body {
   .product-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 12px;
+  }
+
+  .product-card-media {
+    aspect-ratio: 1 / 1;
   }
 
   .product-card-body {

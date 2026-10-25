@@ -61,14 +61,21 @@ const Home = () => {
             <span className="highlight">Shop Smarter.</span>
           </h1>
           <form onSubmit={handleSearch} className="hero-search">
-            <Search size={18} />
+            <Search size={18} className="search-lead-icon" />
             <input
               type="text"
               placeholder="Search for headphones, shoes, watches..."
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
             />
-            <button type="submit">Search</button>
+            <button
+              type="submit"
+              className="hero-search-btn"
+              aria-label="Search"
+              title="Search"
+            >
+              <Search size={19} />
+            </button>
           </form>
         </div>
       </section>

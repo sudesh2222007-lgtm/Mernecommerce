@@ -11,7 +11,7 @@ const getProducts = async (req, res) => {
     const keyword = req.query.keyword
       ? {
           name: {
-            $regex: req.query.keyword,
+            $regex: req.query.keyword.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
             $options: "i",
           },
         }
@@ -21,7 +21,7 @@ const getProducts = async (req, res) => {
 
     const filter = { ...keyword, ...category };
 
-    const [count, products] = await Promise.all([
+    let [count, products] = await Promise.all([
       Product.countDocuments(filter),
       Product.find(filter)
         .lean()
@@ -29,6 +29,23 @@ const getProducts = async (req, res) => {
         .skip(pageSize * (page - 1))
         .sort({ createdAt: -1 }),
     ]);
+
+    if (count === 0 && !req.query.keyword && (!req.query.category || req.query.category === "All")) {
+      try {
+        const autoSeed = require("../utils/autoSeed");
+        await autoSeed();
+        [count, products] = await Promise.all([
+          Product.countDocuments(filter),
+          Product.find(filter)
+            .lean()
+            .limit(pageSize)
+            .skip(pageSize * (page - 1))
+            .sort({ createdAt: -1 }),
+        ]);
+      } catch (seedErr) {
+        console.error("AutoSeed error:", seedErr.message);
+      }
+    }
 
     res.json({
       products,
@@ -53,6 +70,9 @@ const getProductById = async (req, res) => {
       res.status(404).json({ message: "Product not found" });
     }
   } catch (error) {
+    if (error.name === "CastError") {
+      return res.status(404).json({ message: "Product not found" });
+    }
     res.status(500).json({ message: error.message });
   }
 };

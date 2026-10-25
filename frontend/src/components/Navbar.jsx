@@ -48,7 +48,7 @@ const Navbar = () => {
             <div className="nav-user-group">
               <span className="nav-user">
                 <User size={16} />
-                {userInfo.name.split(" ")[0]}
+                {userInfo.name ? userInfo.name.split(" ")[0] : "Account"}
               </span>
               <button onClick={handleLogout} className="icon-btn" title="Logout">
                 <LogOut size={17} />

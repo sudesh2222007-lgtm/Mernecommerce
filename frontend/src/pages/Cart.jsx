@@ -37,7 +37,11 @@ const Cart = () => {
                     updateQty(item._id, Number(e.target.value))
                   }
                 >
-                  {[...Array(item.countInStock || 10).keys()].map((x) => (
+                  {[
+                    ...Array(
+                      Math.max(1, Math.min(Math.floor(item.countInStock || 10), 10))
+                    ).keys(),
+                  ].map((x) => (
                     <option key={x + 1} value={x + 1}>
                       {x + 1}
                     </option>
