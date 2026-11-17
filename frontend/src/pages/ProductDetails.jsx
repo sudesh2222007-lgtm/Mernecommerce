@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ChevronRight, ShieldCheck, Truck } from "lucide-react";
+import { ChevronRight, ShieldCheck, Truck, ShoppingCart, Minus, Plus, Check } from "lucide-react";
 import api from "../api/axios";
 import { useCart } from "../context/CartContext";
 import StarRating from "../components/StarRating";
@@ -14,6 +14,7 @@ const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [qty, setQty] = useState(1);
   const [error, setError] = useState("");
+  const [added, setAdded] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -29,7 +30,10 @@ const ProductDetails = () => {
 
   const handleAddToCart = () => {
     addToCart(product, Number(qty));
-    navigate("/cart");
+    setAdded(true);
+    setTimeout(() => {
+      navigate("/cart");
+    }, 450);
   };
 
   if (error) return <p className="error container">{error}</p>;
@@ -47,15 +51,7 @@ const ProductDetails = () => {
 
       <div className="product-details">
         <div className="details-media">
-          <img
-            src={product.image}
-            alt={product.name}
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src =
-                "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=800&q=80";
-            }}
-          />
+          <img src={product.image} alt={product.name} />
         </div>
 
         <div className="details-info">
@@ -96,28 +92,56 @@ const ProductDetails = () => {
 
           {product.countInStock > 0 && (
             <div className="qty-selector">
-              <label>Quantity</label>
-              <select value={qty} onChange={(e) => setQty(e.target.value)}>
-                {[
-                  ...Array(
-                    Math.max(1, Math.min(Math.floor(product.countInStock || 0), 10))
-                  ).keys(),
-                ].map((x) => (
-                  <option key={x + 1} value={x + 1}>
-                    {x + 1}
-                  </option>
-                ))}
-              </select>
+              <label htmlFor="product-qty">Quantity</label>
+              <div className="qty-stepper">
+                <button
+                  type="button"
+                  className="qty-btn"
+                  onClick={() => setQty((prev) => Math.max(1, Number(prev) - 1))}
+                  disabled={Number(qty) <= 1}
+                  aria-label="Decrease quantity"
+                >
+                  <Minus size={15} />
+                </button>
+                <span className="qty-value">{qty}</span>
+                <button
+                  type="button"
+                  className="qty-btn"
+                  onClick={() =>
+                    setQty((prev) =>
+                      Math.min(Math.min(product.countInStock, 10), Number(prev) + 1)
+                    )
+                  }
+                  disabled={Number(qty) >= Math.min(product.countInStock, 10)}
+                  aria-label="Increase quantity"
+                >
+                  <Plus size={15} />
+                </button>
+              </div>
             </div>
           )}
 
-          <button
-            className="btn-primary"
-            disabled={product.countInStock === 0}
-            onClick={handleAddToCart}
-          >
-            Add To Cart
-          </button>
+          <div className="product-actions">
+            <button
+              className={`add-to-cart-btn ${added ? "added" : ""}`}
+              disabled={product.countInStock === 0}
+              onClick={handleAddToCart}
+            >
+              {added ? (
+                <>
+                  <Check size={20} />
+                  <span>Added to Cart!</span>
+                </>
+              ) : (
+                <>
+                  <ShoppingCart size={20} />
+                  <span>
+                    {product.countInStock === 0 ? "Out of Stock" : "Add to Cart"}
+                  </span>
+                </>
+              )}
+            </button>
+          </div>
 
           <div className="trust-row">
             <span>

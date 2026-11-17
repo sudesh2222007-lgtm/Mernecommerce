@@ -5,13 +5,8 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [userInfo, setUserInfo] = useState(() => {
-    try {
-      const stored = localStorage.getItem("userInfo");
-      return stored ? JSON.parse(stored) : null;
-    } catch {
-      localStorage.removeItem("userInfo");
-      return null;
-    }
+    const stored = localStorage.getItem("userInfo");
+    return stored ? JSON.parse(stored) : null;
   });
 
   const login = async (email, password) => {

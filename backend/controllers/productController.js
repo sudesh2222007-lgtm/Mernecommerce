@@ -1,17 +1,18 @@
 const Product = require("../models/Product");
+const autoSeedIfEmpty = require("../utils/autoSeed");
 
-// @desc    Fetch all products (supports keyword search + pagination)
-// @route   GET /api/products
-// @access  Public
 const getProducts = async (req, res) => {
   try {
-    const pageSize = Number(req.query.limit) || 20;
+    const pageSize = Number(req.query.limit) || 10;
     const page = Number(req.query.page) || 1;
+
+    // Fast-path: autoSeed utility checks internally and sets flag
+    await autoSeedIfEmpty();
 
     const keyword = req.query.keyword
       ? {
           name: {
-            $regex: req.query.keyword.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+            $regex: req.query.keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
             $options: "i",
           },
         }
@@ -21,37 +22,17 @@ const getProducts = async (req, res) => {
 
     const filter = { ...keyword, ...category };
 
-    let [count, products] = await Promise.all([
-      Product.countDocuments(filter),
-      Product.find(filter)
-        .lean()
-        .limit(pageSize)
-        .skip(pageSize * (page - 1))
-        .sort({ createdAt: -1 }),
-    ]);
-
-    if (count === 0 && !req.query.keyword && (!req.query.category || req.query.category === "All")) {
-      try {
-        const autoSeed = require("../utils/autoSeed");
-        await autoSeed();
-        [count, products] = await Promise.all([
-          Product.countDocuments(filter),
-          Product.find(filter)
-            .lean()
-            .limit(pageSize)
-            .skip(pageSize * (page - 1))
-            .sort({ createdAt: -1 }),
-        ]);
-      } catch (seedErr) {
-        console.error("AutoSeed error:", seedErr.message);
-      }
-    }
+    const totalFiltered = await Product.countDocuments(filter);
+    const products = await Product.find(filter)
+      .limit(pageSize)
+      .skip(pageSize * (page - 1))
+      .sort({ createdAt: -1 });
 
     res.json({
       products,
       page,
-      pages: Math.ceil(count / pageSize),
-      total: count,
+      pages: Math.ceil(totalFiltered / pageSize),
+      total: totalFiltered,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -63,16 +44,13 @@ const getProducts = async (req, res) => {
 // @access  Public
 const getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id).lean();
+    const product = await Product.findById(req.params.id);
     if (product) {
       res.json(product);
     } else {
       res.status(404).json({ message: "Product not found" });
     }
   } catch (error) {
-    if (error.name === "CastError") {
-      return res.status(404).json({ message: "Product not found" });
-    }
     res.status(500).json({ message: error.message });
   }
 };

@@ -106,74 +106,62 @@ const sampleProducts = [
   {
     name: "Buds Air True Wireless Earbuds",
     image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&w=800&q=80",
-    description: "Compact in-ear earbuds with environmental noise cancellation, low-latency gaming mode, and 24 hours of case backup.",
+    description: "Compact true wireless earbuds with active noise cancellation, touch controls, and a 24-hour case battery.",
     category: "Electronics",
     brand: "SoundMax",
     price: 1499,
-    mrp: 2999,
-    countInStock: 45,
+    mrp: 2499,
+    countInStock: 60,
     rating: 4.2,
-    numReviews: 189,
+    numReviews: 288,
   },
   {
-    name: "GamerPro Mechanical Keyboard",
-    image: "https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?auto=format&fit=crop&w=800&q=80",
-    description: "Tenkeyless mechanical gaming keyboard with hot-swappable red switches, per-key RGB backlighting, and a braided USB-C cable.",
+    name: "Strike Gaming Mouse",
+    image: "https://images.unsplash.com/photo-1527814050087-3793815479db?auto=format&fit=crop&w=800&q=80",
+    description: "Ergonomic RGB gaming mouse with an 12,800 DPI optical sensor and 6 programmable buttons.",
     category: "Electronics",
-    brand: "KeyForge",
-    price: 3299,
-    mrp: 4999,
-    countInStock: 20,
-    rating: 4.6,
-    numReviews: 95,
+    brand: "GearUp",
+    price: 999,
+    mrp: 1499,
+    countInStock: 45,
+    rating: 4.1,
+    numReviews: 97,
   },
   {
-    name: "Strider Running Shoes",
+    name: "Velocity Running Shoes",
     image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80",
-    description: "Lightweight, responsive running shoes with breathable mesh and high-traction rubber outsole — built for 5Ks or daily jogs.",
+    description: "Lightweight knit running shoes with responsive cushioning and breathable mesh — built for daily training and long-distance comfort.",
     category: "Footwear",
-    brand: "Strider",
-    price: 2999,
-    mrp: 4499,
-    countInStock: 18,
-    rating: 4.6,
-    numReviews: 87,
+    brand: "RunFast",
+    price: 2199,
+    mrp: 2999,
+    countInStock: 40,
+    rating: 4.2,
+    numReviews: 267,
   },
   {
-    name: "TrailBlazer Hiking Boots",
-    image: "https://images.unsplash.com/photo-1520639888713-7851133b1ed0?auto=format&fit=crop&w=800&q=80",
-    description: "Waterproof ankle-high hiking boots with deep lugs and a reinforced toe cap — ready for wet trails and rocky paths.",
-    category: "Footwear",
-    brand: "TrailBlazer",
-    price: 4499,
-    mrp: 6999,
-    countInStock: 10,
-    rating: 4.8,
-    numReviews: 64,
-  },
-  {
-    name: "Classic White Sneakers",
-    image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=800&q=80",
-    description: "Timeless low-top sneakers in clean white leather — goes with jeans, chinos, or shorts.",
+    name: "Street Canvas Sneakers",
+    image: "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&w=800&q=80",
+    description: "Classic low-top canvas sneakers with a durable rubber sole — an everyday staple that pairs with anything.",
     category: "Footwear",
     brand: "UrbanStep",
-    price: 1999,
-    mrp: 2999,
-    countInStock: 35,
-    rating: 4.4,
-    numReviews: 142,
+    price: 1499,
+    mrp: 1999,
+    countInStock: 55,
+    rating: 4.0,
+    numReviews: 183,
   },
   {
-    name: "Belle Structured Handbag",
-    image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80",
-    description: "Vegan-leather structured handbag with a spacious interior, adjustable strap, and gold-tone hardware.",
+    name: "Essential Cotton T-Shirt",
+    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=800&q=80",
+    description: "100% combed cotton crew-neck t-shirt with a relaxed fit — soft, breathable, and pre-shrunk for lasting shape.",
     category: "Fashion",
-    brand: "Belle",
-    price: 1599,
-    mrp: 2499,
-    countInStock: 28,
+    brand: "Basics Co.",
+    price: 499,
+    mrp: 899,
+    countInStock: 100,
     rating: 4.3,
-    numReviews: 96,
+    numReviews: 512,
   },
   {
     name: "Voyage Travel Backpack",
@@ -186,100 +174,33 @@ const sampleProducts = [
     countInStock: 60,
     rating: 4.3,
     numReviews: 231,
-  },
-  {
-    name: "Horizon Polarized Sunglasses",
-    image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=800&q=80",
-    description: "UV400 polarized lenses in a lightweight titanium frame — glare-free clarity for driving, sports, or everyday wear.",
-    category: "Accessories",
-    brand: "SunLine",
-    price: 899,
-    mrp: 1499,
-    countInStock: 33,
-    rating: 4.1,
-    numReviews: 88,
-  },
-  {
-    name: "Fold Leather Wallet",
-    image: "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=800&q=80",
-    description: "Full-grain leather bifold wallet with RFID-blocking card slots and a slim profile that ages beautifully with use.",
-    category: "Accessories",
-    brand: "UrbanCarry",
-    price: 699,
-    mrp: 1199,
-    countInStock: 70,
-    rating: 4.0,
-    numReviews: 155,
-  },
-  {
-    name: "Chrono Analog Wrist Watch",
-    image: "https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&w=800&q=80",
-    description: "Stainless-steel analog watch with a sapphire-coated crystal face and genuine leather strap — timeless and water resistant.",
-    category: "Accessories",
-    brand: "Chrono",
-    price: 2999,
-    mrp: 4999,
-    countInStock: 22,
-    rating: 4.6,
-    numReviews: 118,
-  },
-  {
-    name: "Brew Master Coffee Maker",
-    image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80",
-    description: "12-cup programmable drip coffee maker with a keep-warm plate and reusable filter — barista-quality coffee at home.",
-    category: "Home & Kitchen",
-    brand: "BrewMaster",
-    price: 2499,
-    mrp: 3499,
-    countInStock: 18,
-    rating: 4.4,
-    numReviews: 73,
-  },
-  {
-    name: "Whirl 3-Speed Blender",
-    image: "https://images.unsplash.com/photo-1570222094114-d054a817e56b?auto=format&fit=crop&w=800&q=80",
-    description: "750W countertop blender with a shatterproof jar and 3-speed control — perfect for smoothies, chutneys, and batters.",
-    category: "Home & Kitchen",
-    brand: "Whirl",
-    price: 1799,
-    mrp: 2499,
-    countInStock: 26,
-    rating: 4.2,
-    numReviews: 61,
-  },
+  }
 ];
 
-const autoSeed = async () => {
+let seeded = false;
+
+const autoSeedIfEmpty = async () => {
+  if (seeded) return;
   try {
     const productCount = await Product.countDocuments();
-    if (productCount > 0) return;
-
-    let adminUser = await User.findOne({ email: "admin@example.com" });
-    if (!adminUser) {
-      await User.deleteMany();
-      const createdUsers = await User.insertMany(users);
-      adminUser = createdUsers[0];
+    if (productCount === 0) {
+      console.log("🌱 Database is empty! Auto-seeding initial products and demo accounts...");
+      let createdUsers = await User.find();
+      if (createdUsers.length === 0) {
+        createdUsers = await User.create(users);
+      }
+      const adminUser = createdUsers.find((u) => u.isAdmin) || createdUsers[0];
+      const products = sampleProducts.map((p) => ({
+        ...p,
+        user: adminUser._id,
+      }));
+      await Product.insertMany(products);
+      console.log(`✅ Auto-seeding completed: ${products.length} products inserted.`);
     }
-
-    const sellerTech = (await User.findOne({ email: "seller1@example.com" })) || adminUser;
-    const sellerFashion = (await User.findOne({ email: "seller2@example.com" })) || adminUser;
-
-    const sellerForCategory = (category) => {
-      if (category === "Electronics") return sellerTech._id;
-      if (["Footwear", "Fashion", "Accessories"].includes(category)) return sellerFashion._id;
-      return adminUser._id;
-    };
-
-    const products = sampleProducts.map((p) => ({
-      ...p,
-      user: sellerForCategory(p.category),
-    }));
-
-    await Product.insertMany(products);
-    console.log(`[AutoSeed] Seeded ${products.length} products to database.`);
+    seeded = true;
   } catch (err) {
-    console.error("[AutoSeed Error]:", err.message);
+    console.error("⚠️ Auto-seeding skipped or failed:", err.message);
   }
 };
 
-module.exports = autoSeed;
+module.exports = autoSeedIfEmpty;

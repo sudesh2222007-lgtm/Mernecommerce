@@ -87,4 +87,40 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, getUserProfile };
+// @desc    Send OTP to user phone
+// @route   POST /api/auth/send-otp
+// @access  Public
+const sendOtp = async (req, res) => {
+  try {
+    const { phone } = req.body;
+    res.json({
+      success: true,
+      message: "OTP sent successfully to " + (phone || "phone"),
+      devMode: true,
+      devOtp: "1234",
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Verify OTP code
+// @route   POST /api/auth/verify-otp
+// @access  Public
+const verifyOtp = async (req, res) => {
+  try {
+    const { phone, otp } = req.body;
+    if (otp === "1234" || otp === 1234) {
+      return res.json({
+        success: true,
+        message: "OTP verified successfully",
+      });
+    }
+    res.status(400).json({ success: false, message: "Invalid OTP code. Use 1234." });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { registerUser, loginUser, getUserProfile, sendOtp, verifyOtp };
+

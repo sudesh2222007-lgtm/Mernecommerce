@@ -1,5 +1,5 @@
-import { useEffect, useState, useCallback } from "react";
-import { Search } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import { Search, Sparkles } from "lucide-react";
 import api from "../api/axios";
 import ProductCard from "../components/ProductCard";
 
@@ -18,10 +18,12 @@ const Home = () => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  
+  const searchTimeoutRef = useRef(null);
 
-  const fetchProducts = useCallback(async (search = "", category = "All") => {
+  const fetchProducts = async (search = "", category = "All") => {
     try {
-      setLoading(true);
+      if (products.length === 0) setLoading(true);
       const categoryParam =
         category !== "All"
           ? `&category=${encodeURIComponent(category)}`
@@ -36,14 +38,25 @@ const Home = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
   useEffect(() => {
     fetchProducts();
-  }, [fetchProducts]);
+  }, []);
 
-  const handleSearch = (e) => {
+  const handleSearchChange = (val) => {
+    setKeyword(val);
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    searchTimeoutRef.current = setTimeout(() => {
+      fetchProducts(val, activeCategory);
+    }, 250);
+  };
+
+  const handleSearchSubmit = (e) => {
     e.preventDefault();
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
     fetchProducts(keyword, activeCategory);
   };
 
@@ -53,54 +66,68 @@ const Home = () => {
   };
 
   return (
-    <>
+    <div className="home-page">
+      {/* Luxury Hero Banner */}
       <section className="hero">
         <div className="hero-content">
-          <h1 className="hero-tagline">
-            <span>✨ Discover More.</span>{" "}
-            <span className="highlight">Shop Smarter.</span>
-          </h1>
-          <form onSubmit={handleSearch} className="hero-search">
-            <Search size={18} className="search-lead-icon" />
+          <div className="hero-eyebrow">
+            <Sparkles size={12} className="text-gold" />
+            <span>NORRA ATELIER • SPRING 2026</span>
+          </div>
+          <h1 className="hero-title">Curated Elegance for Modern Living</h1>
+          <p className="hero-subtitle">
+            Explore handcrafted fashion, high-fidelity tech, and iconic essentials defined by timeless craft.
+          </p>
+
+          <form onSubmit={handleSearchSubmit} className="hero-search">
+            <Search size={20} className="search-icon" />
             <input
               type="text"
-              placeholder="Search for headphones, shoes, watches..."
+              placeholder="Search by brand, category, or luxury piece..."
               value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              aria-label="Search products"
             />
-            <button
-              type="submit"
-              className="hero-search-btn"
-              aria-label="Search"
-              title="Search"
-            >
-              <Search size={19} />
-            </button>
           </form>
         </div>
       </section>
 
       <div className="container">
-        <div className="category-pills">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              className={`pill ${activeCategory === cat ? "pill-active" : ""}`}
-              onClick={() => handleCategory(cat)}
-            >
-              {cat}
-            </button>
-          ))}
+        {/* Category Filter Pills */}
+        <div className="category-section">
+          <div className="category-pills">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                className={`pill ${activeCategory === cat ? "pill-active" : ""}`}
+                onClick={() => handleCategory(cat)}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
         </div>
 
+        {/* Section Header */}
         <div className="section-heading">
-          <h2>{activeCategory === "All" ? "Featured Products" : activeCategory}</h2>
-          <span className="section-count">{products.length} items</span>
+          <div>
+            <span className="section-eyebrow">COLLECTION</span>
+            <h2>{activeCategory === "All" ? "Featured Creations" : activeCategory}</h2>
+          </div>
+          <span className="section-count">{products.length} {products.length === 1 ? "piece" : "pieces"}</span>
         </div>
 
-        {loading && <p className="muted">Loading products...</p>}
+        {loading && products.length === 0 && (
+          <div className="loading-state">
+            <div className="spinner"></div>
+            <p className="muted">Curating collection...</p>
+          </div>
+        )}
+
         {error && <p className="error">{error}</p>}
 
+        {/* 2 Products Per Row Grid */}
         <div className="product-grid">
           {products.map((product) => (
             <ProductCard key={product._id} product={product} />
@@ -108,10 +135,12 @@ const Home = () => {
         </div>
 
         {!loading && products.length === 0 && (
-          <p className="muted">No products found. Try another search.</p>
+          <div className="empty-catalog">
+            <p className="muted">No products matched your search. Explore other categories.</p>
+          </div>
         )}
       </div>
-    </>
+    </div>
   );
 };
 

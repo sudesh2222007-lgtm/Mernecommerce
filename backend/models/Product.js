@@ -50,7 +50,7 @@ const productSchema = new mongoose.Schema(
     },
     mrp: {
       type: Number,
-      default: 0,
+      default: 0, // original "Maximum Retail Price" shown struck-through when higher than price
     },
     countInStock: {
       type: Number,
@@ -69,9 +69,5 @@ const productSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-productSchema.index({ createdAt: -1 });
-productSchema.index({ category: 1, createdAt: -1 });
-productSchema.index({ name: "text" });
 
 module.exports = mongoose.model("Product", productSchema);
