@@ -44,8 +44,10 @@ export default function Navbar() {
       <div className="navbar-inner">
         {/* Brand Name */}
         <Link to="/" className="brand" onClick={() => setMobileMenuOpen(false)}>
-          <span className="brand-mark">N</span>
-          <span className="brand-name">NORRA</span>
+          <img src="/favicon.svg" alt="NORRA Logo" className="brand-logo-mark" />
+          <span className="brand-name">
+            NORRA <span className="brand-badge-ecom">ECOM</span>
+          </span>
         </Link>
 
         {/* Mobile Actions: Cart & Menu Button */}

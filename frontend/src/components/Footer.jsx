@@ -36,9 +36,9 @@ const Footer = () => {
 
       <div className="footer-bottom">
         <span className="brand-mini">
-          <span className="brand-mark">N</span> Norra
+          <span className="brand-mark">N</span> NORRA ECOM
         </span>
-        <p>© {new Date().getFullYear()} Norra Mini Store. Built as a MERN stack learning project.</p>
+        <p>© {new Date().getFullYear()} NORRA ECOM · Luxury Maison &amp; Curated Atelier. All rights reserved.</p>
       </div>
     </footer>
   );

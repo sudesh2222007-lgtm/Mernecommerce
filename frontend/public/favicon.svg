@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#141824"/>
+      <stop offset="50%" stop-color="#0A0C12"/>
+      <stop offset="100%" stop-color="#05060A"/>
+    </linearGradient>
+
+    <!-- Metallic Gold Gradient -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF5D6"/>
+      <stop offset="25%" stop-color="#F2D06B"/>
+      <stop offset="50%" stop-color="#D4AF37"/>
+      <stop offset="80%" stop-color="#AA7C11"/>
+      <stop offset="100%" stop-color="#7A5600"/>
+    </linearGradient>
+
+    <!-- Accent Diamond Gradient -->
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="50%" stop-color="#F5E4B2"/>
+      <stop offset="100%" stop-color="#D4AF37"/>
+    </linearGradient>
+
+    <!-- Border Metallic Ring -->
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F2D06B" stop-opacity="0.8"/>
+      <stop offset="50%" stop-color="#D4AF37" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#7A5600" stop-opacity="0.6"/>
+    </linearGradient>
+
+    <!-- Ambient Luxury Glow -->
+    <radialGradient id="centerGlow" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#D4AF37" stop-opacity="0.22"/>
+      <stop offset="60%" stop-color="#D4AF37" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="goldShine" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#D4AF37" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Base Squircle -->
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#bgGrad)"/>
+  
+  <!-- Subtle Ambient Glow -->
+  <circle cx="256" cy="240" r="210" fill="url(#centerGlow)"/>
+
+  <!-- Inner Elegant Border -->
+  <rect x="24" y="24" width="464" height="464" rx="104" fill="none" stroke="url(#borderGrad)" stroke-width="3"/>
+  <rect x="36" y="36" width="440" height="440" rx="94" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+
+  <!-- 4-Point Sparkling Luxury Star (Top Right) -->
+  <path d="M 400 96 Q 400 124 372 124 Q 400 124 400 152 Q 400 124 428 124 Q 400 124 400 96 Z" fill="url(#accentGrad)" filter="url(#goldShine)"/>
+
+  <!-- Chiseled Luxury Monogram 'N' -->
+  <g filter="url(#goldShine)">
+    <!-- Left Pillar with Classical Serif Heads -->
+    <path d="M 126 130 L 194 130 L 194 150 L 176 154 L 176 348 L 196 352 L 196 372 L 126 372 L 126 352 L 146 348 L 146 154 L 126 150 Z" fill="url(#goldGrad)"/>
+
+    <!-- Right Pillar with Classical Serif Heads -->
+    <path d="M 316 130 L 386 130 L 386 150 L 366 154 L 366 348 L 386 352 L 386 372 L 316 372 L 316 352 L 336 348 L 336 154 L 316 150 Z" fill="url(#goldGrad)"/>
+
+    <!-- Dynamic Diagonal Slash with Chiseled Edge -->
+    <polygon points="172,142 222,142 342,352 292,352" fill="url(#goldGrad)"/>
+    
+    <!-- Light Reflection Highlight on Diagonal -->
+    <polygon points="172,142 192,142 312,352 292,352" fill="url(#accentGrad)" opacity="0.6"/>
+  </g>
+
+  <!-- Luxury Brand Tagline -->
+  <text x="256" y="432" font-family="'Cinzel', 'Playfair Display', 'Sora', serif, sans-serif" font-size="28" font-weight="700" fill="url(#goldGrad)" letter-spacing="9" text-anchor="middle">NORRA</text>
+  <text x="256" y="458" font-family="'Inter', sans-serif" font-size="12" font-weight="600" fill="#8E9BB0" letter-spacing="5" text-anchor="middle">ECOM</text>
+</svg>
