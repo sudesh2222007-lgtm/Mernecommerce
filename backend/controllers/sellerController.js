@@ -1,7 +1,28 @@
 const mongoose = require("mongoose");
 const Product = require("../models/Product");
+const autoSeed = require("../utils/autoSeed");
 
 global.sellerProducts = global.sellerProducts || [];
+
+const fallbackCatalog = (autoSeed.sampleProducts || []).map((p, idx) => ({
+  _id: `norra_sample_${idx + 1}`,
+  ...p,
+  createdAt: new Date().toISOString(),
+}));
+
+const getSellerCatalog = (user) => {
+  if (!user) return [];
+  const uid = String(user._id);
+  // Match by user._id or fallback demo ids
+  if (user.isAdmin || uid === "demo_admin") {
+    // Admin has access to their atelier creations as well as overview
+    const adminItems = fallbackCatalog.filter(
+      (p) => String(p.user) === "demo_admin" || String(p.user) === uid
+    );
+    return adminItems.length > 0 ? adminItems : fallbackCatalog;
+  }
+  return fallbackCatalog.filter((p) => String(p.user) === uid);
+};
 
 // @desc    Get products belonging to the logged-in seller
 // @route   GET /api/seller/products
@@ -21,11 +42,23 @@ const getMyProducts = async (req, res) => {
       }
     }
 
+    const sellerCatalog = getSellerCatalog(req.user);
+
     const memProducts = (global.sellerProducts || []).filter((p) =>
       req.user.isAdmin ? true : String(p.user) === String(req.user._id)
     );
 
-    res.json([...products, ...memProducts]);
+    // Merge: DB items, seller's catalog products, and created in-memory items (dedup by _id)
+    const combined = [...products, ...sellerCatalog, ...memProducts];
+    const seen = new Set();
+    const deduped = combined.filter((p) => {
+      const id = String(p._id);
+      if (seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    });
+
+    res.json(deduped);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -212,14 +245,23 @@ const getSellerSummary = async (req, res) => {
       }
     }
 
+    const sellerCatalog = getSellerCatalog(req.user);
+
     const memProducts = (global.sellerProducts || []).filter((p) =>
       req.user.isAdmin ? true : String(p.user) === String(req.user._id)
     );
-    const combined = [...products, ...memProducts];
+    const combined = [...products, ...sellerCatalog, ...memProducts];
+    const seen = new Set();
+    const deduped = combined.filter((p) => {
+      const id = String(p._id);
+      if (seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    });
 
-    const totalProducts = combined.length;
-    const outOfStock = combined.filter((p) => Number(p.countInStock) === 0).length;
-    const lowStock = combined.filter(
+    const totalProducts = deduped.length;
+    const outOfStock = deduped.filter((p) => Number(p.countInStock) === 0).length;
+    const lowStock = deduped.filter(
       (p) => Number(p.countInStock) > 0 && Number(p.countInStock) <= 5
     ).length;
 

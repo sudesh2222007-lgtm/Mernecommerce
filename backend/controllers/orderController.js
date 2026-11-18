@@ -3,7 +3,85 @@ const Order = require("../models/Order");
 const Product = require("../models/Product");
 const autoSeed = require("../utils/autoSeed");
 
-global.fallbackOrders = global.fallbackOrders || [];
+const defaultSampleOrders = [
+  {
+    _id: "ord_sample_101",
+    user: { _id: "demo_john", name: "John Doe", email: "john@example.com" },
+    orderItems: [
+      {
+        _id: "item_101_1",
+        name: "Norra Royal Tourbillon Timepiece",
+        qty: 1,
+        image: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=800&q=80",
+        price: 18999,
+        product: "norra_sample_1",
+        seller: "demo_admin",
+        isDelivered: false,
+      },
+      {
+        _id: "item_101_2",
+        name: "Aria Wireless ANC Headphones",
+        qty: 1,
+        image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80",
+        price: 2499,
+        product: "norra_sample_7",
+        seller: "demo_seller1",
+        isDelivered: true,
+      },
+    ],
+    shippingAddress: {
+      address: "14 Rue du Faubourg Saint-Honoré",
+      city: "Paris",
+      postalCode: "75008",
+      country: "France",
+    },
+    paymentMethod: "Credit Card (Stripe)",
+    itemsPrice: 21498,
+    shippingPrice: 0,
+    taxPrice: 0,
+    totalPrice: 21498,
+    isPaid: true,
+    paidAt: new Date(Date.now() - 86400000).toISOString(),
+    isDelivered: false,
+    createdAt: new Date(Date.now() - 86400000).toISOString(),
+  },
+  {
+    _id: "ord_sample_102",
+    user: { _id: "demo_john", name: "John Doe", email: "john@example.com" },
+    orderItems: [
+      {
+        _id: "item_102_1",
+        name: "Monochrome Low-Top Leather Sneakers",
+        qty: 1,
+        image: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?auto=format&fit=crop&w=800&q=80",
+        price: 3499,
+        product: "norra_sample_15",
+        seller: "demo_seller2",
+        isDelivered: false,
+      },
+    ],
+    shippingAddress: {
+      address: "221B Baker Street",
+      city: "London",
+      postalCode: "NW1 6XE",
+      country: "United Kingdom",
+    },
+    paymentMethod: "Apple Pay",
+    itemsPrice: 3499,
+    shippingPrice: 0,
+    taxPrice: 0,
+    totalPrice: 3499,
+    isPaid: true,
+    paidAt: new Date(Date.now() - 172800000).toISOString(),
+    isDelivered: false,
+    createdAt: new Date(Date.now() - 172800000).toISOString(),
+  },
+];
+
+global.fallbackOrders =
+  global.fallbackOrders && global.fallbackOrders.length > 0
+    ? global.fallbackOrders
+    : defaultSampleOrders;
 
 const fallbackProducts = (autoSeed.sampleProducts || []).map((p, idx) => ({
   _id: `norra_sample_${idx + 1}`,
@@ -112,7 +190,85 @@ const addOrderItems = async (req, res) => {
       createdAt: new Date().toISOString(),
     };
 
-    global.fallbackOrders = global.fallbackOrders || [];
+    const defaultSampleOrders = [
+  {
+    _id: "ord_sample_101",
+    user: { _id: "demo_john", name: "John Doe", email: "john@example.com" },
+    orderItems: [
+      {
+        _id: "item_101_1",
+        name: "Norra Royal Tourbillon Timepiece",
+        qty: 1,
+        image: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=800&q=80",
+        price: 18999,
+        product: "norra_sample_1",
+        seller: "demo_admin",
+        isDelivered: false,
+      },
+      {
+        _id: "item_101_2",
+        name: "Aria Wireless ANC Headphones",
+        qty: 1,
+        image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80",
+        price: 2499,
+        product: "norra_sample_7",
+        seller: "demo_seller1",
+        isDelivered: true,
+      },
+    ],
+    shippingAddress: {
+      address: "14 Rue du Faubourg Saint-Honoré",
+      city: "Paris",
+      postalCode: "75008",
+      country: "France",
+    },
+    paymentMethod: "Credit Card (Stripe)",
+    itemsPrice: 21498,
+    shippingPrice: 0,
+    taxPrice: 0,
+    totalPrice: 21498,
+    isPaid: true,
+    paidAt: new Date(Date.now() - 86400000).toISOString(),
+    isDelivered: false,
+    createdAt: new Date(Date.now() - 86400000).toISOString(),
+  },
+  {
+    _id: "ord_sample_102",
+    user: { _id: "demo_john", name: "John Doe", email: "john@example.com" },
+    orderItems: [
+      {
+        _id: "item_102_1",
+        name: "Monochrome Low-Top Leather Sneakers",
+        qty: 1,
+        image: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?auto=format&fit=crop&w=800&q=80",
+        price: 3499,
+        product: "norra_sample_15",
+        seller: "demo_seller2",
+        isDelivered: false,
+      },
+    ],
+    shippingAddress: {
+      address: "221B Baker Street",
+      city: "London",
+      postalCode: "NW1 6XE",
+      country: "United Kingdom",
+    },
+    paymentMethod: "Apple Pay",
+    itemsPrice: 3499,
+    shippingPrice: 0,
+    taxPrice: 0,
+    totalPrice: 3499,
+    isPaid: true,
+    paidAt: new Date(Date.now() - 172800000).toISOString(),
+    isDelivered: false,
+    createdAt: new Date(Date.now() - 172800000).toISOString(),
+  },
+];
+
+global.fallbackOrders =
+  global.fallbackOrders && global.fallbackOrders.length > 0
+    ? global.fallbackOrders
+    : defaultSampleOrders;
     global.fallbackOrders.push(fallbackOrder);
     res.status(201).json(fallbackOrder);
   } catch (error) {

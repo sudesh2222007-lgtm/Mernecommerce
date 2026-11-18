@@ -34,7 +34,7 @@ const getFallbackCatalog = (category, keyword, page, pageSize) => {
 };
 
 const getProducts = async (req, res) => {
-  const pageSize = Math.min(Number(req.query.limit) || 12, 50);
+  const pageSize = Math.min(Number(req.query.limit) || 24, 50);
   const page = Math.max(Number(req.query.page) || 1, 1);
 
   try {
