@@ -1,5 +1,8 @@
 const mongoose = require("mongoose");
 
+// Disable 10-second command buffering so queries never hang if connection is establishing
+mongoose.set("bufferCommands", false);
+
 let cached = global.mongoose;
 
 if (!cached) {
@@ -11,29 +14,38 @@ const connectDB = async () => {
     return cached.conn;
   }
 
+  if (!process.env.MONGO_URI) {
+    console.warn("⚠️ MONGO_URI is not set. Operating in resilient offline fallback mode.");
+    return null;
+  }
+
   if (!cached.promise) {
     const opts = {
       maxPoolSize: 10,
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 4000,
       socketTimeoutMS: 30000,
       family: 4, // Use IPv4, skip IPv6 resolution delays
     };
 
-    cached.promise = mongoose.connect(process.env.MONGO_URI, opts).then((mongooseInstance) => {
-      console.log(`✅ MongoDB Connected: ${mongooseInstance.connection.host}/${mongooseInstance.connection.name}`);
-      return mongooseInstance;
-    });
+    cached.promise = mongoose
+      .connect(process.env.MONGO_URI, opts)
+      .then((mongooseInstance) => {
+        console.log(`✅ MongoDB Connected: ${mongooseInstance.connection.host}/${mongooseInstance.connection.name}`);
+        return mongooseInstance;
+      })
+      .catch((err) => {
+        cached.promise = null;
+        console.error(`❌ MongoDB connection failed: ${err.message}`);
+        return null;
+      });
   }
 
   try {
     cached.conn = await cached.promise;
   } catch (error) {
     cached.promise = null;
-    console.error(`❌ Error connecting to MongoDB: ${error.message}`);
-    if (process.env.NODE_ENV !== "production") {
-      process.exit(1);
-    }
-    throw error;
+    console.error(`❌ Error awaiting MongoDB connection: ${error.message}`);
+    return null;
   }
 
   return cached.conn;

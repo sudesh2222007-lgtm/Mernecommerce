@@ -1,9 +1,49 @@
+const mongoose = require("mongoose");
 const Product = require("../models/Product");
+const autoSeed = require("../utils/autoSeed");
+
+const fallbackProducts = (autoSeed.sampleProducts || []).map((p, idx) => ({
+  _id: `norra_sample_${idx + 1}`,
+  ...p,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+}));
+
+const getFallbackCatalog = (category, keyword, page, pageSize) => {
+  let list = fallbackProducts;
+  if (category && category !== "All") {
+    list = list.filter((p) => p.category.toLowerCase() === category.toLowerCase());
+  }
+  if (keyword) {
+    const k = keyword.toLowerCase();
+    list = list.filter(
+      (p) =>
+        p.name.toLowerCase().includes(k) ||
+        (p.brand && p.brand.toLowerCase().includes(k)) ||
+        (p.category && p.category.toLowerCase().includes(k))
+    );
+  }
+  const total = list.length;
+  const paginated = list.slice((page - 1) * pageSize, page * pageSize);
+  return {
+    products: paginated,
+    page,
+    pages: Math.ceil(total / pageSize) || 1,
+    total,
+  };
+};
 
 const getProducts = async (req, res) => {
+  const pageSize = Math.min(Number(req.query.limit) || 12, 50);
+  const page = Math.max(Number(req.query.page) || 1, 1);
+
   try {
-    const pageSize = Math.min(Number(req.query.limit) || 12, 50);
-    const page = Math.max(Number(req.query.page) || 1, 1);
+    // If MongoDB is not yet connected, return resilient sample catalog immediately
+    if (mongoose.connection.readyState !== 1) {
+      const fallback = getFallbackCatalog(req.query.category, req.query.keyword, page, pageSize);
+      res.set("Cache-Control", "public, max-age=30, s-maxage=60, stale-while-revalidate=300");
+      return res.json(fallback);
+    }
 
     const keyword = req.query.keyword
       ? {
@@ -14,9 +54,10 @@ const getProducts = async (req, res) => {
         }
       : {};
 
-    const category = req.query.category && req.query.category !== "All"
-      ? { category: req.query.category }
-      : {};
+    const category =
+      req.query.category && req.query.category !== "All"
+        ? { category: req.query.category }
+        : {};
 
     const filter = { ...keyword, ...category };
 
@@ -43,7 +84,9 @@ const getProducts = async (req, res) => {
       total: totalFiltered,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.warn("⚠️ Database query error, returning fallback catalog:", error.message);
+    const fallback = getFallbackCatalog(req.query.category, req.query.keyword, page, pageSize);
+    res.json(fallback);
   }
 };
 
@@ -52,14 +95,22 @@ const getProducts = async (req, res) => {
 // @access  Public
 const getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id).lean();
-    if (product) {
-      res.set("Cache-Control", "public, max-age=60, s-maxage=120, stale-while-revalidate=600");
-      res.json(product);
-    } else {
-      res.status(404).json({ message: "Product not found" });
+    if (mongoose.connection.readyState === 1) {
+      const product = await Product.findById(req.params.id).lean();
+      if (product) {
+        res.set("Cache-Control", "public, max-age=60, s-maxage=120, stale-while-revalidate=600");
+        return res.json(product);
+      }
     }
+    const sample = fallbackProducts.find((p) => p._id === req.params.id);
+    if (sample) {
+      res.set("Cache-Control", "public, max-age=60, s-maxage=120, stale-while-revalidate=600");
+      return res.json(sample);
+    }
+    res.status(404).json({ message: "Product not found" });
   } catch (error) {
+    const sample = fallbackProducts.find((p) => p._id === req.params.id);
+    if (sample) return res.json(sample);
     res.status(500).json({ message: error.message });
   }
 };

@@ -212,4 +212,5 @@ const autoSeedIfEmpty = async () => {
   return seedPromise;
 };
 
+autoSeedIfEmpty.sampleProducts = sampleProducts;
 module.exports = autoSeedIfEmpty;
