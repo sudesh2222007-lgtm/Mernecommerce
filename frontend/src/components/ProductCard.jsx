@@ -5,7 +5,7 @@ import StarRating from "./StarRating";
 import { useCart } from "../context/CartContext";
 import { formatPrice, discountPercent } from "../utils/format";
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, priority = false }) => {
   const { addToCart } = useCart();
   const [justAdded, setJustAdded] = useState(false);
   const off = discountPercent(product.mrp, product.price);
@@ -21,8 +21,18 @@ const ProductCard = ({ product }) => {
 
   return (
     <div className="product-card">
-      <Link to={`/product/${product._id}`} className="product-card-media">
-        <img src={product.image} alt={product.name} loading="lazy" />
+      <Link
+        to={`/product/${product._id}`}
+        state={{ product }}
+        className="product-card-media"
+      >
+        <img
+          src={product.image}
+          alt={product.name}
+          loading={priority ? "eager" : "lazy"}
+          decoding="async"
+          fetchpriority={priority ? "high" : "auto"}
+        />
         <span className="product-card-category">{product.category}</span>
         {off > 0 && <span className="discount-ribbon">{off}% OFF</span>}
         
@@ -64,7 +74,11 @@ const ProductCard = ({ product }) => {
           </span>
         </div>
 
-        <Link to={`/product/${product._id}`} className="product-card-title">
+        <Link
+          to={`/product/${product._id}`}
+          state={{ product }}
+          className="product-card-title"
+        >
           {product.name}
         </Link>
 

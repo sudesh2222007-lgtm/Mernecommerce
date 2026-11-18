@@ -70,4 +70,9 @@ const productSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// High-performance indexes for zero-delay sorting, category filtering, and search
+productSchema.index({ category: 1, createdAt: -1 });
+productSchema.index({ createdAt: -1 });
+productSchema.index({ name: 1 });
+
 module.exports = mongoose.model("Product", productSchema);

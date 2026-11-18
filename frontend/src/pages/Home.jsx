@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Search, Sparkles } from "lucide-react";
 import api from "../api/axios";
 import ProductCard from "../components/ProductCard";
@@ -12,37 +12,97 @@ const CATEGORIES = [
   "Home & Kitchen",
 ];
 
+// Memory cache for instantaneous client-side navigation
+const memoryCache = new Map();
+
+const getCache = (key) => {
+  if (memoryCache.has(key)) return memoryCache.get(key);
+  try {
+    const raw = sessionStorage.getItem(`norra_c_${key}`);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      memoryCache.set(key, parsed);
+      return parsed;
+    }
+  } catch (e) {}
+  return null;
+};
+
+const setCache = (key, data) => {
+  memoryCache.set(key, data);
+  try {
+    sessionStorage.setItem(`norra_c_${key}`, JSON.stringify(data));
+  } catch (e) {}
+};
+
+// Shimmering luxury skeleton card for 0-delay perception
+const ProductSkeleton = () => (
+  <div className="product-card skeleton-card">
+    <div className="skeleton-media shimmer"></div>
+    <div className="product-card-body">
+      <div className="skeleton-line skeleton-meta shimmer"></div>
+      <div className="skeleton-line skeleton-title shimmer"></div>
+      <div className="skeleton-line skeleton-title-sub shimmer"></div>
+      <div className="skeleton-line skeleton-price shimmer"></div>
+    </div>
+  </div>
+);
+
 const Home = () => {
-  const [products, setProducts] = useState([]);
+  // Initialize with cached products immediately on first render if available
+  const [products, setProducts] = useState(() => {
+    const initial = getCache("All");
+    return initial?.products || [];
+  });
   const [keyword, setKeyword] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => {
+    const initial = getCache("All");
+    return !(initial?.products && initial.products.length > 0);
+  });
   const [error, setError] = useState("");
   
   const searchTimeoutRef = useRef(null);
 
-  const fetchProducts = async (search = "", category = "All") => {
+  const fetchProducts = useCallback(async (search = "", category = "All") => {
+    const cacheKey = `${category}_${search.trim().toLowerCase()}`;
+    const cached = getCache(cacheKey);
+
+    // If cached, render immediately without showing a blank screen
+    if (cached?.products?.length) {
+      setProducts(cached.products);
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
+
     try {
-      if (products.length === 0) setLoading(true);
       const categoryParam =
         category !== "All"
           ? `&category=${encodeURIComponent(category)}`
           : "";
-      const { data } = await api.get(
-        `/products?keyword=${encodeURIComponent(search)}${categoryParam}`
-      );
-      setProducts(data.products || []);
+      const searchParam = search ? `keyword=${encodeURIComponent(search)}` : "";
+      const queryParams = [searchParam, categoryParam].filter(Boolean).join("&");
+      const url = queryParams ? `/products?${queryParams}` : "/products";
+
+      const { data } = await api.get(url);
+      const fetchedProducts = data.products || [];
+      
+      setProducts(fetchedProducts);
+      setCache(cacheKey, { products: fetchedProducts });
       setError("");
     } catch (err) {
-      setError(err.response?.data?.message || "Something went wrong");
+      if (!cached) {
+        setError(err.response?.data?.message || "Failed to load products");
+      }
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    fetchProducts(keyword, activeCategory);
+  }, [fetchProducts, activeCategory]);
 
   const handleSearchChange = (val) => {
     setKeyword(val);
@@ -51,7 +111,7 @@ const Home = () => {
     }
     searchTimeoutRef.current = setTimeout(() => {
       fetchProducts(val, activeCategory);
-    }, 250);
+    }, 200);
   };
 
   const handleSearchSubmit = (e) => {
@@ -61,8 +121,16 @@ const Home = () => {
   };
 
   const handleCategory = (category) => {
+    if (category === activeCategory) return;
     setActiveCategory(category);
-    fetchProducts(keyword, category);
+    // Instant switch to cached category if present
+    const cached = getCache(`${category}_${keyword.trim().toLowerCase()}`);
+    if (cached?.products?.length) {
+      setProducts(cached.products);
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
   };
 
   return (
@@ -115,26 +183,29 @@ const Home = () => {
             <span className="section-eyebrow">COLLECTION</span>
             <h2>{activeCategory === "All" ? "Featured Creations" : activeCategory}</h2>
           </div>
-          <span className="section-count">{products.length} {products.length === 1 ? "piece" : "pieces"}</span>
+          <span className="section-count">
+            {loading && products.length === 0 ? "..." : `${products.length} ${products.length === 1 ? "piece" : "pieces"}`}
+          </span>
         </div>
-
-        {loading && products.length === 0 && (
-          <div className="loading-state">
-            <div className="spinner"></div>
-            <p className="muted">Curating collection...</p>
-          </div>
-        )}
 
         {error && <p className="error">{error}</p>}
 
-        {/* 2 Products Per Row Grid */}
+        {/* 2 Products Per Row Luxury Grid with Shimmer Skeletons */}
         <div className="product-grid">
-          {products.map((product) => (
-            <ProductCard key={product._id} product={product} />
-          ))}
+          {loading && products.length === 0
+            ? Array.from({ length: 6 }).map((_, i) => (
+                <ProductSkeleton key={`skeleton-${i}`} />
+              ))
+            : products.map((product, idx) => (
+                <ProductCard
+                  key={product._id}
+                  product={product}
+                  priority={idx < 4}
+                />
+              ))}
         </div>
 
-        {!loading && products.length === 0 && (
+        {!loading && products.length === 0 && !error && (
           <div className="empty-catalog">
             <p className="muted">No products matched your search. Explore other categories.</p>
           </div>

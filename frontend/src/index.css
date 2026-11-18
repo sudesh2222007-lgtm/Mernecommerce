@@ -568,6 +568,77 @@ button:disabled {
   border-color: rgba(203, 161, 87, 0.35);
 }
 
+/* Product Skeleton Placeholders (Zero-Delay Loading Perception) */
+.skeleton-card {
+  pointer-events: none;
+  border-color: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.skeleton-media {
+  width: 100%;
+  aspect-ratio: 16 / 11;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.skeleton-line {
+  height: 12px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  margin-bottom: 8px;
+}
+
+.skeleton-meta {
+  width: 42%;
+  height: 9px;
+  margin-bottom: 10px;
+}
+
+.skeleton-title {
+  width: 88%;
+  height: 13px;
+}
+
+.skeleton-title-sub {
+  width: 58%;
+  height: 13px;
+  margin-bottom: 12px;
+}
+
+.skeleton-price {
+  width: 44%;
+  height: 16px;
+  margin-top: 4px;
+}
+
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(212, 175, 55, 0.09) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmerFlow 1.6s infinite ease-in-out;
+  transform: translateX(-100%);
+}
+
+@keyframes shimmerFlow {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 .product-card-media {
   position: relative;
   display: block;
@@ -2062,7 +2133,8 @@ button:disabled {
     border-radius: 12px;
   }
 
-  .product-card-media {
+  .product-card-media,
+  .skeleton-media {
     aspect-ratio: 1 / 1;
   }
 

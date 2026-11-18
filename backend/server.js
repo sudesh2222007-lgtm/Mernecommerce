@@ -21,12 +21,15 @@ if (process.env.MONGO_URI) {
 
 const app = express();
 
-// Ensure DB is connected & seeded for serverless invocations
+// Ensure DB is connected for serverless invocations (auto-seed runs non-blocking in background)
 app.use(async (req, res, next) => {
   if (process.env.MONGO_URI) {
     try {
       await connectDB();
-      await autoSeedIfEmpty();
+      // Non-blocking auto-seed so requests are never delayed
+      autoSeedIfEmpty().catch((err) => {
+        console.warn("⚠️ Background seed warning:", err.message);
+      });
     } catch (err) {
       return res.status(500).json({ message: "Database connection failed", error: err.message });
     }

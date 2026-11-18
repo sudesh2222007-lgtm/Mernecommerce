@@ -178,29 +178,38 @@ const sampleProducts = [
 ];
 
 let seeded = false;
+let seedPromise = null;
 
 const autoSeedIfEmpty = async () => {
   if (seeded) return;
-  try {
-    const productCount = await Product.countDocuments();
-    if (productCount === 0) {
-      console.log("🌱 Database is empty! Auto-seeding initial products and demo accounts...");
-      let createdUsers = await User.find();
-      if (createdUsers.length === 0) {
-        createdUsers = await User.create(users);
+  if (seedPromise) return seedPromise;
+
+  seedPromise = (async () => {
+    try {
+      const productCount = await Product.countDocuments();
+      if (productCount === 0) {
+        console.log("🌱 Database is empty! Auto-seeding initial products and demo accounts...");
+        let createdUsers = await User.find();
+        if (createdUsers.length === 0) {
+          createdUsers = await User.create(users);
+        }
+        const adminUser = createdUsers.find((u) => u.isAdmin) || createdUsers[0];
+        const products = sampleProducts.map((p) => ({
+          ...p,
+          user: adminUser._id,
+        }));
+        await Product.insertMany(products);
+        console.log(`✅ Auto-seeding completed: ${products.length} products inserted.`);
       }
-      const adminUser = createdUsers.find((u) => u.isAdmin) || createdUsers[0];
-      const products = sampleProducts.map((p) => ({
-        ...p,
-        user: adminUser._id,
-      }));
-      await Product.insertMany(products);
-      console.log(`✅ Auto-seeding completed: ${products.length} products inserted.`);
+      seeded = true;
+    } catch (err) {
+      console.error("⚠️ Auto-seeding skipped or failed:", err.message);
+    } finally {
+      seedPromise = null;
     }
-    seeded = true;
-  } catch (err) {
-    console.error("⚠️ Auto-seeding skipped or failed:", err.message);
-  }
+  })();
+
+  return seedPromise;
 };
 
 module.exports = autoSeedIfEmpty;

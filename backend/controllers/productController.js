@@ -1,13 +1,9 @@
 const Product = require("../models/Product");
-const autoSeedIfEmpty = require("../utils/autoSeed");
 
 const getProducts = async (req, res) => {
   try {
-    const pageSize = Number(req.query.limit) || 10;
-    const page = Number(req.query.page) || 1;
-
-    // Fast-path: autoSeed utility checks internally and sets flag
-    await autoSeedIfEmpty();
+    const pageSize = Math.min(Number(req.query.limit) || 12, 50);
+    const page = Math.max(Number(req.query.page) || 1, 1);
 
     const keyword = req.query.keyword
       ? {
@@ -18,20 +14,32 @@ const getProducts = async (req, res) => {
         }
       : {};
 
-    const category = req.query.category ? { category: req.query.category } : {};
+    const category = req.query.category && req.query.category !== "All"
+      ? { category: req.query.category }
+      : {};
 
     const filter = { ...keyword, ...category };
 
-    const totalFiltered = await Product.countDocuments(filter);
-    const products = await Product.find(filter)
-      .limit(pageSize)
-      .skip(pageSize * (page - 1))
-      .sort({ createdAt: -1 });
+    // Parallel execution with lean querying and omitting heavy review subdocuments
+    const [totalFiltered, products] = await Promise.all([
+      Product.countDocuments(filter),
+      Product.find(filter)
+        .select("-reviews")
+        .limit(pageSize)
+        .skip(pageSize * (page - 1))
+        .sort({ createdAt: -1 })
+        .lean(),
+    ]);
+
+    // Enable high-speed Edge & Browser caching for default catalog views
+    if (!req.query.keyword) {
+      res.set("Cache-Control", "public, max-age=30, s-maxage=60, stale-while-revalidate=300");
+    }
 
     res.json({
       products,
       page,
-      pages: Math.ceil(totalFiltered / pageSize),
+      pages: Math.ceil(totalFiltered / pageSize) || 1,
       total: totalFiltered,
     });
   } catch (error) {
@@ -44,8 +52,9 @@ const getProducts = async (req, res) => {
 // @access  Public
 const getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id).lean();
     if (product) {
+      res.set("Cache-Control", "public, max-age=60, s-maxage=120, stale-while-revalidate=600");
       res.json(product);
     } else {
       res.status(404).json({ message: "Product not found" });

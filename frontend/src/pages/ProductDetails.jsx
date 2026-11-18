@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import { ChevronRight, ShieldCheck, Truck, ShoppingCart, Minus, Plus, Check } from "lucide-react";
 import api from "../api/axios";
 import { useCart } from "../context/CartContext";
@@ -9,23 +9,46 @@ import { formatPrice, discountPercent } from "../utils/format";
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { addToCart } = useCart();
 
-  const [product, setProduct] = useState(null);
+  // Instant display from router state if navigating from product card, or session cache
+  const [product, setProduct] = useState(() => {
+    if (location.state?.product && location.state.product._id === id) {
+      return location.state.product;
+    }
+    try {
+      const cached = sessionStorage.getItem(`norra_single_${id}`);
+      if (cached) return JSON.parse(cached);
+    } catch (e) {}
+    return null;
+  });
+
   const [qty, setQty] = useState(1);
   const [error, setError] = useState("");
   const [added, setAdded] = useState(false);
 
   useEffect(() => {
+    let isMounted = true;
     const fetchProduct = async () => {
       try {
         const { data } = await api.get(`/products/${id}`);
-        setProduct(data);
+        if (isMounted) {
+          setProduct(data);
+          try {
+            sessionStorage.setItem(`norra_single_${id}`, JSON.stringify(data));
+          } catch (e) {}
+        }
       } catch (err) {
-        setError(err.response?.data?.message || "Product not found");
+        if (isMounted && !product) {
+          setError(err.response?.data?.message || "Product not found");
+        }
       }
     };
     fetchProduct();
+    return () => {
+      isMounted = false;
+    };
   }, [id]);
 
   const handleAddToCart = () => {
