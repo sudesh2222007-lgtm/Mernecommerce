@@ -3,6 +3,9 @@ const User = require("../models/User");
 const generateToken = require("../utils/generateToken");
 const connectDB = require("../config/db");
 
+// Persistent fallback registry in global scope across hot serverless executions
+global.fallbackUsers = global.fallbackUsers || [];
+
 const demoUsers = [
   { _id: "demo_admin", name: "Admin User", email: "admin@example.com", password: "123456", isAdmin: true, isSeller: false },
   { _id: "demo_john", name: "John Doe", email: "john@example.com", password: "123456", isAdmin: false, isSeller: false },
@@ -21,48 +24,103 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ message: "Please fill all fields" });
     }
 
+    if (password.length < 6) {
+      return res.status(400).json({ message: "Password must be at least 6 characters" });
+    }
+
     if (isSeller && !storeName) {
       return res
         .status(400)
         .json({ message: "Please provide a store name to register as a seller" });
     }
 
+    const cleanEmail = email.toLowerCase().trim();
+
+    // 1. Try DB connection if configured
     if (process.env.MONGO_URI && mongoose.connection.readyState !== 1) {
       try {
         await connectDB();
       } catch (e) {}
     }
 
-    if (mongoose.connection.readyState !== 1) {
-      return res.status(503).json({
-        message: "Database connection in progress. For immediate preview, use Demo Login (admin@example.com).",
+    // 2. If connected to MongoDB, persist to MongoDB
+    if (mongoose.connection.readyState === 1) {
+      const userExists = await User.findOne({ email: cleanEmail });
+      if (userExists) {
+        return res.status(400).json({ message: "User already exists" });
+      }
+
+      const user = await User.create({
+        name: name.trim(),
+        email: cleanEmail,
+        password,
+        isSeller: !!isSeller,
+        storeName: isSeller ? (storeName || "").trim() : "",
+      });
+
+      return res.status(201).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        isSeller: user.isSeller,
+        storeName: user.storeName,
+        token: generateToken({
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          isAdmin: user.isAdmin,
+          isSeller: user.isSeller,
+          storeName: user.storeName,
+        }),
       });
     }
 
-    const userExists = await User.findOne({ email });
-    if (userExists) {
+    // 3. Resilient offline/serverless fallback: allow instant registration without blocking
+    const existsInDemo = demoUsers.some((u) => u.email.toLowerCase() === cleanEmail);
+    const existsInFallback = (global.fallbackUsers || []).some(
+      (u) => u.email.toLowerCase() === cleanEmail
+    );
+
+    if (existsInDemo || existsInFallback) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    const user = await User.create({
-      name,
-      email,
-      password,
+    const newUser = {
+      _id: "usr_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8),
+      name: name.trim(),
+      email: cleanEmail,
+      password: password,
+      isAdmin: false,
       isSeller: !!isSeller,
-      storeName: isSeller ? storeName : "",
+      storeName: isSeller ? (storeName || "").trim() : "",
+      createdAt: new Date().toISOString(),
+    };
+
+    global.fallbackUsers = global.fallbackUsers || [];
+    global.fallbackUsers.push(newUser);
+
+    const token = generateToken({
+      id: newUser._id,
+      name: newUser.name,
+      email: newUser.email,
+      isAdmin: newUser.isAdmin,
+      isSeller: newUser.isSeller,
+      storeName: newUser.storeName,
     });
 
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      isAdmin: user.isAdmin,
-      isSeller: user.isSeller,
-      storeName: user.storeName,
-      token: generateToken(user._id),
+    return res.status(201).json({
+      _id: newUser._id,
+      name: newUser.name,
+      email: newUser.email,
+      isAdmin: newUser.isAdmin,
+      isSeller: newUser.isSeller,
+      storeName: newUser.storeName,
+      token,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Register error:", error);
+    res.status(500).json({ message: error.message || "Registration failed" });
   }
 };
 
@@ -77,6 +135,8 @@ const loginUser = async (req, res) => {
       return res.status(400).json({ message: "Please enter email and password" });
     }
 
+    const cleanEmail = email.toLowerCase().trim();
+
     // Try DB connection if configured
     if (process.env.MONGO_URI && mongoose.connection.readyState !== 1) {
       try {
@@ -86,7 +146,7 @@ const loginUser = async (req, res) => {
 
     // If connected to MongoDB, query the database
     if (mongoose.connection.readyState === 1) {
-      const user = await User.findOne({ email: email.toLowerCase() });
+      const user = await User.findOne({ email: cleanEmail });
       if (user && (await user.matchPassword(password))) {
         return res.json({
           _id: user._id,
@@ -95,15 +155,24 @@ const loginUser = async (req, res) => {
           isAdmin: user.isAdmin,
           isSeller: user.isSeller,
           storeName: user.storeName,
-          token: generateToken(user._id),
+          token: generateToken({
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            isAdmin: user.isAdmin,
+            isSeller: user.isSeller,
+            storeName: user.storeName,
+          }),
         });
       }
-      return res.status(401).json({ message: "Invalid email or password" });
+      if (user) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
     }
 
-    // Resilient offline / demo fallback authentication
+    // Check demo users
     const demo = demoUsers.find(
-      (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
+      (u) => u.email.toLowerCase() === cleanEmail && u.password === password
     );
 
     if (demo) {
@@ -114,7 +183,38 @@ const loginUser = async (req, res) => {
         isAdmin: demo.isAdmin,
         isSeller: demo.isSeller,
         storeName: demo.storeName || "",
-        token: generateToken(demo._id),
+        token: generateToken({
+          id: demo._id,
+          name: demo.name,
+          email: demo.email,
+          isAdmin: demo.isAdmin,
+          isSeller: demo.isSeller,
+          storeName: demo.storeName || "",
+        }),
+      });
+    }
+
+    // Check fallback registered users
+    const fallback = (global.fallbackUsers || []).find(
+      (u) => u.email.toLowerCase() === cleanEmail && u.password === password
+    );
+
+    if (fallback) {
+      return res.json({
+        _id: fallback._id,
+        name: fallback.name,
+        email: fallback.email,
+        isAdmin: fallback.isAdmin,
+        isSeller: fallback.isSeller,
+        storeName: fallback.storeName || "",
+        token: generateToken({
+          id: fallback._id,
+          name: fallback.name,
+          email: fallback.email,
+          isAdmin: fallback.isAdmin,
+          isSeller: fallback.isSeller,
+          storeName: fallback.storeName || "",
+        }),
       });
     }
 
@@ -122,11 +222,12 @@ const loginUser = async (req, res) => {
       message: "Invalid email or password. (For demo access, use admin@example.com / 123456)",
     });
   } catch (error) {
-    // If DB fails, fallback to demo check
+    console.error("Login error:", error);
+    const cleanEmail = (req.body?.email || "").toLowerCase().trim();
+    const password = req.body?.password;
+
     const demo = demoUsers.find(
-      (u) =>
-        u.email.toLowerCase() === (req.body?.email || "").toLowerCase() &&
-        u.password === req.body?.password
+      (u) => u.email.toLowerCase() === cleanEmail && u.password === password
     );
     if (demo) {
       return res.json({
@@ -136,9 +237,39 @@ const loginUser = async (req, res) => {
         isAdmin: demo.isAdmin,
         isSeller: demo.isSeller,
         storeName: demo.storeName || "",
-        token: generateToken(demo._id),
+        token: generateToken({
+          id: demo._id,
+          name: demo.name,
+          email: demo.email,
+          isAdmin: demo.isAdmin,
+          isSeller: demo.isSeller,
+          storeName: demo.storeName || "",
+        }),
       });
     }
+
+    const fallback = (global.fallbackUsers || []).find(
+      (u) => u.email.toLowerCase() === cleanEmail && u.password === password
+    );
+    if (fallback) {
+      return res.json({
+        _id: fallback._id,
+        name: fallback.name,
+        email: fallback.email,
+        isAdmin: fallback.isAdmin,
+        isSeller: fallback.isSeller,
+        storeName: fallback.storeName || "",
+        token: generateToken({
+          id: fallback._id,
+          name: fallback.name,
+          email: fallback.email,
+          isAdmin: fallback.isAdmin,
+          isSeller: fallback.isSeller,
+          storeName: fallback.storeName || "",
+        }),
+      });
+    }
+
     res.status(500).json({ message: error.message });
   }
 };

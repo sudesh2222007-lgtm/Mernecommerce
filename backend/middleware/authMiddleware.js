@@ -33,6 +33,35 @@ const protect = async (req, res, next) => {
         req.user = await User.findById(decoded.id).select("-password");
       }
 
+      // In-memory fallback user lookup
+      if (!req.user && global.fallbackUsers) {
+        const mem = global.fallbackUsers.find(
+          (u) => u._id === decoded.id || (decoded.email && u.email === decoded.email)
+        );
+        if (mem) {
+          req.user = {
+            _id: mem._id,
+            name: mem.name,
+            email: mem.email,
+            isAdmin: !!mem.isAdmin,
+            isSeller: !!mem.isSeller,
+            storeName: mem.storeName || "",
+          };
+        }
+      }
+
+      // Self-contained token claim fallback (resilient across serverless containers)
+      if (!req.user && decoded.email) {
+        req.user = {
+          _id: decoded.id,
+          name: decoded.name || "User",
+          email: decoded.email,
+          isAdmin: !!decoded.isAdmin,
+          isSeller: !!decoded.isSeller,
+          storeName: decoded.storeName || "",
+        };
+      }
+
       if (!req.user) {
         return res.status(401).json({ message: "User not found" });
       }
