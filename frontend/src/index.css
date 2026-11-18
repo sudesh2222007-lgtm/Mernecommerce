@@ -1826,12 +1826,232 @@ button:disabled {
 }
 
 .seller-products-table .table-thumb {
-  width: 42px;
-  height: 42px;
+  width: 48px;
+  height: 48px;
   object-fit: cover;
-  border-radius: 6px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
 }
 
+.table-sub-brand {
+  display: block;
+  font-size: 0.76rem;
+  color: var(--muted);
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+.stock-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: #f0fdf4;
+  color: #166534;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: 1px solid #bbf7d0;
+}
+
+/* Aligned Action Buttons in My Products */
+td.table-actions-cell {
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.table-actions-group {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  vertical-align: middle;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  box-sizing: border-box;
+  cursor: pointer;
+  line-height: 1;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.edit-action-btn {
+  background: #ffffff;
+  color: var(--text);
+  border: 1px solid #d1d5db;
+}
+
+.edit-action-btn:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+  color: #111827;
+}
+
+.delete-action-btn {
+  background: #fff5f5;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.delete-action-btn:hover {
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #b91c1c;
+}
+
+/* Local Gallery / URL Image Selector */
+.image-field-block {
+  margin-top: 14px;
+  padding: 16px;
+  background: #fafaf9;
+  border: 1px solid #e7e5e4;
+  border-radius: 10px;
+}
+
+.image-field-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.image-field-header label {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.image-mode-toggles {
+  display: inline-flex;
+  gap: 6px;
+  background: #f5f5f4;
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid #e7e5e4;
+}
+
+.image-tab-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: #78716c;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.image-tab-pill.active {
+  background: #ffffff;
+  color: #1c1917;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.gallery-dropzone {
+  border: 2px dashed #d6d3d1;
+  border-radius: 10px;
+  padding: 24px;
+  text-align: center;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gallery-dropzone:hover {
+  border-color: var(--gold);
+  background: #fffdfa;
+}
+
+.dropzone-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.dropzone-icon {
+  color: var(--gold);
+}
+
+.url-input-wrap input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 0.88rem;
+}
+
+.product-image-preview-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: #ffffff;
+  border: 1px solid #e7e5e4;
+  border-radius: 8px;
+}
+
+.preview-img-tag {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #e7e5e4;
+}
+
+.preview-details {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.preview-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #15803d;
+  background: #f0fdf4;
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1px solid #bbf7d0;
+}
+
+.clear-image-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #dc2626;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+}
+
+.clear-image-button:hover {
+  text-decoration: underline;
+}
+
+/* Legacy / Fallback table actions */
 .table-actions {
   display: flex;
   align-items: center;

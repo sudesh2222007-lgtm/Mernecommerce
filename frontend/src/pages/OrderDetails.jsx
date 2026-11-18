@@ -35,9 +35,16 @@ const OrderDetails = () => {
       <h1>Order {order._id}</h1>
 
       <div className="order-section">
-        <h3>Shipping</h3>
+        <h3>Customer & Shipping</h3>
+        <p style={{ marginBottom: "8px" }}>
+          <strong>Buyer:</strong>{" "}
+          <span style={{ color: "#b7791f", fontWeight: "600" }}>
+            {order.buyerName || order.user?.name || (typeof order.user === "string" ? order.user : "Customer")}
+          </span>
+          {(order.buyerEmail || order.user?.email) && ` (${order.buyerEmail || order.user?.email})`}
+        </p>
         <p>
-          {order.shippingAddress.address}, {order.shippingAddress.city}{" "}
+          <strong>Address:</strong> {order.shippingAddress.address}, {order.shippingAddress.city}{" "}
           {order.shippingAddress.postalCode}, {order.shippingAddress.country}
         </p>
         <p>Status: {order.isDelivered ? "Delivered" : "Not Delivered"}</p>

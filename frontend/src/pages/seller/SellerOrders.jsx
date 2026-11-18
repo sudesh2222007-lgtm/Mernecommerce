@@ -48,10 +48,20 @@ const SellerOrders = () => {
             <div key={order._id} className="seller-order-card">
               <div className="seller-order-header">
                 <div>
-                  <strong>Order #{order._id.slice(-8).toUpperCase()}</strong>
-                  <p className="hint">
-                    Placed by {order.user?.name || "Customer"} on{" "}
-                    {new Date(order.createdAt).toLocaleDateString()}
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+                    <strong style={{ fontSize: "1.05rem", color: "var(--text)" }}>Order #{order._id.slice(-8).toUpperCase()}</strong>
+                    <span style={{ fontSize: "0.78rem", padding: "2px 8px", background: "#f3f4f6", borderRadius: "12px", color: "#6b7280" }}>
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <p className="order-buyer-info" style={{ margin: "4px 0", fontSize: "0.92rem", color: "var(--text)" }}>
+                    <span style={{ color: "#718096", fontWeight: "500" }}>Buyer:</span>{" "}
+                    <strong style={{ color: "#b7791f", fontWeight: "600" }}>
+                      {order.buyerName || order.user?.name || (typeof order.user === "string" ? order.user : "Customer")}
+                    </strong>
+                    {(order.buyerEmail || order.user?.email) && (
+                      <span style={{ color: "#718096", fontSize: "0.85rem" }}> ({order.buyerEmail || order.user?.email})</span>
+                    )}
                   </p>
                 </div>
                 <div className="seller-order-status">
@@ -61,8 +71,8 @@ const SellerOrders = () => {
                 </div>
               </div>
 
-              <p className="hint">
-                Ship to: {order.shippingAddress?.address}, {order.shippingAddress?.city}{" "}
+              <p className="hint" style={{ marginTop: "6px" }}>
+                <strong>Ship to:</strong> {order.shippingAddress?.address}, {order.shippingAddress?.city}{" "}
                 {order.shippingAddress?.postalCode}, {order.shippingAddress?.country}
               </p>
 

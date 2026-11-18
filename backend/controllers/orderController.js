@@ -7,6 +7,8 @@ const defaultSampleOrders = [
   {
     _id: "ord_sample_101",
     user: { _id: "demo_john", name: "John Doe", email: "john@example.com" },
+    buyerName: "John Doe",
+    buyerEmail: "john@example.com",
     orderItems: [
       {
         _id: "item_101_1",
@@ -24,7 +26,7 @@ const defaultSampleOrders = [
         qty: 1,
         image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80",
         price: 2499,
-        product: "norra_sample_7",
+        product: "norra_sample_9",
         seller: "demo_seller1",
         isDelivered: true,
       },
@@ -47,17 +49,62 @@ const defaultSampleOrders = [
   },
   {
     _id: "ord_sample_102",
-    user: { _id: "demo_john", name: "John Doe", email: "john@example.com" },
+    user: { _id: "demo_sarah", name: "Sarah Jenkins", email: "sarah.j@example.com" },
+    buyerName: "Sarah Jenkins",
+    buyerEmail: "sarah.j@example.com",
     orderItems: [
       {
         _id: "item_102_1",
-        name: "Monochrome Low-Top Leather Sneakers",
+        name: "Aura Sculpted Gold Pendant",
         qty: 1,
-        image: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?auto=format&fit=crop&w=800&q=80",
-        price: 3499,
-        product: "norra_sample_15",
-        seller: "demo_seller2",
+        image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=800&q=80",
+        price: 8499,
+        product: "norra_sample_2",
+        seller: "demo_admin",
         isDelivered: false,
+      },
+      {
+        _id: "item_102_2",
+        name: "Pulse Horizon Smart Watch",
+        qty: 1,
+        image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80",
+        price: 3499,
+        product: "norra_sample_10",
+        seller: "demo_seller1",
+        isDelivered: false,
+      },
+    ],
+    shippingAddress: {
+      address: "450 5th Avenue, Suite 1200",
+      city: "New York",
+      postalCode: "10018",
+      country: "United States",
+    },
+    paymentMethod: "Apple Pay",
+    itemsPrice: 11998,
+    shippingPrice: 0,
+    taxPrice: 0,
+    totalPrice: 11998,
+    isPaid: true,
+    paidAt: new Date(Date.now() - 172800000).toISOString(),
+    isDelivered: false,
+    createdAt: new Date(Date.now() - 172800000).toISOString(),
+  },
+  {
+    _id: "ord_sample_103",
+    user: { _id: "demo_david", name: "David Miller", email: "david.m@example.com" },
+    buyerName: "David Miller",
+    buyerEmail: "david.m@example.com",
+    orderItems: [
+      {
+        _id: "item_103_1",
+        name: "Lumina Frame Mirrorless Camera",
+        qty: 1,
+        image: "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?auto=format&fit=crop&w=800&q=80",
+        price: 42999,
+        product: "norra_sample_12",
+        seller: "demo_seller1",
+        isDelivered: true,
       },
     ],
     shippingAddress: {
@@ -66,15 +113,16 @@ const defaultSampleOrders = [
       postalCode: "NW1 6XE",
       country: "United Kingdom",
     },
-    paymentMethod: "Apple Pay",
-    itemsPrice: 3499,
+    paymentMethod: "Credit Card (Visa)",
+    itemsPrice: 42999,
     shippingPrice: 0,
     taxPrice: 0,
-    totalPrice: 3499,
+    totalPrice: 42999,
     isPaid: true,
-    paidAt: new Date(Date.now() - 172800000).toISOString(),
-    isDelivered: false,
-    createdAt: new Date(Date.now() - 172800000).toISOString(),
+    paidAt: new Date(Date.now() - 259200000).toISOString(),
+    isDelivered: true,
+    deliveredAt: new Date(Date.now() - 86400000).toISOString(),
+    createdAt: new Date(Date.now() - 259200000).toISOString(),
   },
 ];
 
@@ -194,6 +242,8 @@ const addOrderItems = async (req, res) => {
   {
     _id: "ord_sample_101",
     user: { _id: "demo_john", name: "John Doe", email: "john@example.com" },
+    buyerName: "John Doe",
+    buyerEmail: "john@example.com",
     orderItems: [
       {
         _id: "item_101_1",
@@ -211,7 +261,7 @@ const addOrderItems = async (req, res) => {
         qty: 1,
         image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80",
         price: 2499,
-        product: "norra_sample_7",
+        product: "norra_sample_9",
         seller: "demo_seller1",
         isDelivered: true,
       },
@@ -234,17 +284,62 @@ const addOrderItems = async (req, res) => {
   },
   {
     _id: "ord_sample_102",
-    user: { _id: "demo_john", name: "John Doe", email: "john@example.com" },
+    user: { _id: "demo_sarah", name: "Sarah Jenkins", email: "sarah.j@example.com" },
+    buyerName: "Sarah Jenkins",
+    buyerEmail: "sarah.j@example.com",
     orderItems: [
       {
         _id: "item_102_1",
-        name: "Monochrome Low-Top Leather Sneakers",
+        name: "Aura Sculpted Gold Pendant",
         qty: 1,
-        image: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?auto=format&fit=crop&w=800&q=80",
-        price: 3499,
-        product: "norra_sample_15",
-        seller: "demo_seller2",
+        image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=800&q=80",
+        price: 8499,
+        product: "norra_sample_2",
+        seller: "demo_admin",
         isDelivered: false,
+      },
+      {
+        _id: "item_102_2",
+        name: "Pulse Horizon Smart Watch",
+        qty: 1,
+        image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80",
+        price: 3499,
+        product: "norra_sample_10",
+        seller: "demo_seller1",
+        isDelivered: false,
+      },
+    ],
+    shippingAddress: {
+      address: "450 5th Avenue, Suite 1200",
+      city: "New York",
+      postalCode: "10018",
+      country: "United States",
+    },
+    paymentMethod: "Apple Pay",
+    itemsPrice: 11998,
+    shippingPrice: 0,
+    taxPrice: 0,
+    totalPrice: 11998,
+    isPaid: true,
+    paidAt: new Date(Date.now() - 172800000).toISOString(),
+    isDelivered: false,
+    createdAt: new Date(Date.now() - 172800000).toISOString(),
+  },
+  {
+    _id: "ord_sample_103",
+    user: { _id: "demo_david", name: "David Miller", email: "david.m@example.com" },
+    buyerName: "David Miller",
+    buyerEmail: "david.m@example.com",
+    orderItems: [
+      {
+        _id: "item_103_1",
+        name: "Lumina Frame Mirrorless Camera",
+        qty: 1,
+        image: "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?auto=format&fit=crop&w=800&q=80",
+        price: 42999,
+        product: "norra_sample_12",
+        seller: "demo_seller1",
+        isDelivered: true,
       },
     ],
     shippingAddress: {
@@ -253,15 +348,16 @@ const addOrderItems = async (req, res) => {
       postalCode: "NW1 6XE",
       country: "United Kingdom",
     },
-    paymentMethod: "Apple Pay",
-    itemsPrice: 3499,
+    paymentMethod: "Credit Card (Visa)",
+    itemsPrice: 42999,
     shippingPrice: 0,
     taxPrice: 0,
-    totalPrice: 3499,
+    totalPrice: 42999,
     isPaid: true,
-    paidAt: new Date(Date.now() - 172800000).toISOString(),
-    isDelivered: false,
-    createdAt: new Date(Date.now() - 172800000).toISOString(),
+    paidAt: new Date(Date.now() - 259200000).toISOString(),
+    isDelivered: true,
+    deliveredAt: new Date(Date.now() - 86400000).toISOString(),
+    createdAt: new Date(Date.now() - 259200000).toISOString(),
   },
 ];
 
@@ -404,6 +500,33 @@ const getOrders = async (req, res) => {
   }
 };
 
+const resolveBuyer = (order) => {
+  let buyer = order.user;
+  if (typeof buyer === "object" && buyer?.name) {
+    return { name: buyer.name, email: buyer.email || "" };
+  }
+  const uid = typeof buyer === "string" ? buyer : String(buyer?._id || "");
+  const found = [
+    { _id: "demo_admin", name: "Admin User", email: "admin@example.com" },
+    { _id: "demo_john", name: "John Doe", email: "john@example.com" },
+    { _id: "demo_sarah", name: "Sarah Jenkins", email: "sarah.j@example.com" },
+    { _id: "demo_david", name: "David Miller", email: "david.m@example.com" },
+    { _id: "demo_seller1", name: "Priya Sharma", email: "seller1@example.com" },
+    ...(global.fallbackUsers || []),
+  ].find((u) => String(u._id) === uid || String(u.email) === uid);
+
+  if (found) {
+    return { name: found.name, email: found.email };
+  }
+  if (order.buyerName) {
+    return { name: order.buyerName, email: order.buyerEmail || "" };
+  }
+  if (order.shippingAddress?.fullName || order.shippingAddress?.name) {
+    return { name: order.shippingAddress.fullName || order.shippingAddress.name, email: "" };
+  }
+  return { name: "Valued Customer", email: "" };
+};
+
 // @desc    Get orders containing items sold by the logged-in seller
 //          (each order is trimmed down to only that seller's own line items)
 // @route   GET /api/orders/seller
@@ -437,9 +560,17 @@ const getSellerOrders = async (req, res) => {
 
         if (myItems.length === 0) return null;
 
+        const buyerInfo = resolveBuyer(order);
+
         return {
           _id: order._id,
-          user: order.user,
+          user: {
+            _id: typeof order.user === "object" ? order.user?._id : order.user,
+            name: buyerInfo.name,
+            email: buyerInfo.email,
+          },
+          buyerName: buyerInfo.name,
+          buyerEmail: buyerInfo.email,
           shippingAddress: order.shippingAddress,
           paymentMethod: order.paymentMethod,
           isPaid: order.isPaid,

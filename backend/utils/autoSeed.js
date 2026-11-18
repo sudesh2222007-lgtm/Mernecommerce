@@ -21,17 +21,12 @@ const users = [
     isSeller: true,
     storeName: "TechNest Store",
   },
-  {
-    name: "Rahul Verma",
-    email: "seller2@example.com",
-    password: "123456",
-    isSeller: true,
-    storeName: "Urban Threads",
-  },
 ];
 
 const sampleProducts = [
+  // ========================================================
   // --- Admin Flagship Atelier Collection (demo_admin) ---
+  // ========================================================
   {
     name: "Norra Royal Tourbillon Timepiece",
     image: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=800&q=80",
@@ -110,8 +105,36 @@ const sampleProducts = [
     numReviews: 78,
     user: "demo_admin",
   },
+  {
+    name: "Velvet Tuxedo Smoking Jacket",
+    image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80",
+    description: "Deep midnight blue Italian silk-velvet dinner jacket with satin shawl lapels and grosgrain frogging.",
+    category: "Fashion",
+    brand: "Norra Atelier",
+    price: 13999,
+    mrp: 18999,
+    countInStock: 7,
+    rating: 4.9,
+    numReviews: 36,
+    user: "demo_admin",
+  },
+  {
+    name: "Pavé Diamond Signet Ring",
+    image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=800&q=80",
+    description: "18k yellow gold heavy cushion signet ring handset with 0.85 carats of VVS round brilliant pavé diamonds.",
+    category: "Accessories",
+    brand: "Norra Atelier",
+    price: 9999,
+    mrp: 13999,
+    countInStock: 10,
+    rating: 4.9,
+    numReviews: 53,
+    user: "demo_admin",
+  },
 
+  // ========================================================
   // --- TechNest Store (demo_seller1 - Priya Sharma) ---
+  // ========================================================
   {
     name: "Aria Wireless ANC Headphones",
     image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80",
@@ -203,98 +226,18 @@ const sampleProducts = [
     numReviews: 288,
     user: "demo_seller1",
   },
-
-  // --- Urban Threads (demo_seller2 - Rahul Verma) ---
   {
-    name: "Velocity Ultra Running Shoes",
-    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80",
-    description: "Engineered mesh running shoes with nitrogen-infused midsole foam for maximum energy return on asphalt.",
-    category: "Footwear",
-    brand: "RunFast",
-    price: 2199,
-    mrp: 2999,
-    countInStock: 40,
-    rating: 4.2,
-    numReviews: 267,
-    user: "demo_seller2",
-  },
-  {
-    name: "Monochrome Low-Top Leather Sneakers",
-    image: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?auto=format&fit=crop&w=800&q=80",
-    description: "Minimalist Italian nappa leather sneakers with stitched Margom rubber cupsoles and calfskin lining.",
-    category: "Footwear",
-    brand: "UrbanStep",
-    price: 3499,
-    mrp: 4999,
-    countInStock: 35,
-    rating: 4.6,
-    numReviews: 194,
-    user: "demo_seller2",
-  },
-  {
-    name: "Heritage Chelsea Suede Boots",
-    image: "https://images.unsplash.com/photo-1638247025967-b4e38f787b76?auto=format&fit=crop&w=800&q=80",
-    description: "Water-repellent English suede Chelsea boots with Goodyear welted construction and crepe rubber soles.",
-    category: "Footwear",
-    brand: "UrbanStep",
-    price: 4999,
-    mrp: 6999,
-    countInStock: 20,
-    rating: 4.7,
-    numReviews: 143,
-    user: "demo_seller2",
-  },
-  {
-    name: "Heavyweight Supima Cotton Tee",
-    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=800&q=80",
-    description: "240 GSM organic Supima cotton t-shirt with a structured drape, double-stitched hem, and velvety handfeel.",
-    category: "Fashion",
-    brand: "Basics Co.",
-    price: 799,
-    mrp: 1299,
-    countInStock: 85,
-    rating: 4.5,
-    numReviews: 320,
-    user: "demo_seller2",
-  },
-  {
-    name: "Relaxed French Terry Hoodie",
-    image: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80",
-    description: "Heavyweight 450 GSM French terry cotton hoodie with double-lined hood and zero-drawstring minimalist design.",
-    category: "Fashion",
-    brand: "Urban Threads",
-    price: 2499,
-    mrp: 3499,
-    countInStock: 45,
-    rating: 4.6,
-    numReviews: 188,
-    user: "demo_seller2",
-  },
-  {
-    name: "Artisanal Woven Silk Scarf",
-    image: "https://images.unsplash.com/photo-1601924994987-69e26d50dc26?auto=format&fit=crop&w=800&q=80",
-    description: "Hand-rolled twill mulberry silk scarf featuring an archival geometric motif rendered with natural vegetable dyes.",
-    category: "Accessories",
-    brand: "Urban Threads",
-    price: 1899,
-    mrp: 2699,
-    countInStock: 30,
-    rating: 4.8,
-    numReviews: 94,
-    user: "demo_seller2",
-  },
-  {
-    name: "Voyage Tech Commuter Backpack",
-    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80",
-    description: "Cordura ballistic nylon commuter pack with magnetic Fidlock buckles, anti-theft zipper, and fleece-lined laptop sleeve.",
-    category: "Accessories",
-    brand: "UrbanCarry",
+    name: "UltraCharge Wireless Desktop Hub",
+    image: "https://images.unsplash.com/photo-1622445262464-84b14e3235b3?auto=format&fit=crop&w=800&q=80",
+    description: "3-in-1 magnetic wireless charging station in aerospace anodized aluminum with 15W fast charging output.",
+    category: "Electronics",
+    brand: "TimeTech",
     price: 1999,
     mrp: 2999,
-    countInStock: 50,
-    rating: 4.4,
-    numReviews: 215,
-    user: "demo_seller2",
+    countInStock: 40,
+    rating: 4.6,
+    numReviews: 142,
+    user: "demo_seller1",
   },
 ];
 
@@ -316,12 +259,10 @@ const autoSeedIfEmpty = async () => {
         }
         const adminUser = createdUsers.find((u) => u.isAdmin) || createdUsers[0];
         const seller1 = createdUsers.find((u) => u.email === "seller1@example.com") || adminUser;
-        const seller2 = createdUsers.find((u) => u.email === "seller2@example.com") || adminUser;
 
         const userMap = {
           demo_admin: adminUser._id,
           demo_seller1: seller1._id,
-          demo_seller2: seller2._id,
         };
 
         const products = sampleProducts.map((p) => ({
