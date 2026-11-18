@@ -1,8 +1,5 @@
 const mongoose = require("mongoose");
 
-// Disable 10-second command buffering so queries never hang if connection is establishing
-mongoose.set("bufferCommands", false);
-
 let cached = global.mongoose;
 
 if (!cached) {

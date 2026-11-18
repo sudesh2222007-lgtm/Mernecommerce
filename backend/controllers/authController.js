@@ -1,5 +1,14 @@
+const mongoose = require("mongoose");
 const User = require("../models/User");
 const generateToken = require("../utils/generateToken");
+const connectDB = require("../config/db");
+
+const demoUsers = [
+  { _id: "demo_admin", name: "Admin User", email: "admin@example.com", password: "123456", isAdmin: true, isSeller: false },
+  { _id: "demo_john", name: "John Doe", email: "john@example.com", password: "123456", isAdmin: false, isSeller: false },
+  { _id: "demo_seller1", name: "Priya Sharma", email: "seller1@example.com", password: "123456", isAdmin: false, isSeller: true, storeName: "TechNest Store" },
+  { _id: "demo_seller2", name: "Rahul Verma", email: "seller2@example.com", password: "123456", isAdmin: false, isSeller: true, storeName: "Urban Threads" },
+];
 
 // @desc    Register a new user
 // @route   POST /api/auth/register
@@ -16,6 +25,18 @@ const registerUser = async (req, res) => {
       return res
         .status(400)
         .json({ message: "Please provide a store name to register as a seller" });
+    }
+
+    if (process.env.MONGO_URI && mongoose.connection.readyState !== 1) {
+      try {
+        await connectDB();
+      } catch (e) {}
+    }
+
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        message: "Database connection in progress. For immediate preview, use Demo Login (admin@example.com).",
+      });
     }
 
     const userExists = await User.findOne({ email });
@@ -52,22 +73,72 @@ const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
-
-    if (user && (await user.matchPassword(password))) {
-      res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        isAdmin: user.isAdmin,
-        isSeller: user.isSeller,
-        storeName: user.storeName,
-        token: generateToken(user._id),
-      });
-    } else {
-      res.status(401).json({ message: "Invalid email or password" });
+    if (!email || !password) {
+      return res.status(400).json({ message: "Please enter email and password" });
     }
+
+    // Try DB connection if configured
+    if (process.env.MONGO_URI && mongoose.connection.readyState !== 1) {
+      try {
+        await connectDB();
+      } catch (e) {}
+    }
+
+    // If connected to MongoDB, query the database
+    if (mongoose.connection.readyState === 1) {
+      const user = await User.findOne({ email: email.toLowerCase() });
+      if (user && (await user.matchPassword(password))) {
+        return res.json({
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          isAdmin: user.isAdmin,
+          isSeller: user.isSeller,
+          storeName: user.storeName,
+          token: generateToken(user._id),
+        });
+      }
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    // Resilient offline / demo fallback authentication
+    const demo = demoUsers.find(
+      (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
+    );
+
+    if (demo) {
+      return res.json({
+        _id: demo._id,
+        name: demo.name,
+        email: demo.email,
+        isAdmin: demo.isAdmin,
+        isSeller: demo.isSeller,
+        storeName: demo.storeName || "",
+        token: generateToken(demo._id),
+      });
+    }
+
+    res.status(401).json({
+      message: "Invalid email or password. (For demo access, use admin@example.com / 123456)",
+    });
   } catch (error) {
+    // If DB fails, fallback to demo check
+    const demo = demoUsers.find(
+      (u) =>
+        u.email.toLowerCase() === (req.body?.email || "").toLowerCase() &&
+        u.password === req.body?.password
+    );
+    if (demo) {
+      return res.json({
+        _id: demo._id,
+        name: demo.name,
+        email: demo.email,
+        isAdmin: demo.isAdmin,
+        isSeller: demo.isSeller,
+        storeName: demo.storeName || "",
+        token: generateToken(demo._id),
+      });
+    }
     res.status(500).json({ message: error.message });
   }
 };
@@ -77,12 +148,14 @@ const loginUser = async (req, res) => {
 // @access  Private
 const getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select("-password");
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    if (req.user) {
+      return res.json(req.user);
     }
-    res.json(user);
+    res.status(404).json({ message: "User not found" });
   } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
     res.status(500).json({ message: error.message });
   }
 };

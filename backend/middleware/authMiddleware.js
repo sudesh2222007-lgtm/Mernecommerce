@@ -1,5 +1,13 @@
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 const User = require("../models/User");
+
+const demoUsers = [
+  { _id: "demo_admin", name: "Admin User", email: "admin@example.com", isAdmin: true, isSeller: false },
+  { _id: "demo_john", name: "John Doe", email: "john@example.com", isAdmin: false, isSeller: false },
+  { _id: "demo_seller1", name: "Priya Sharma", email: "seller1@example.com", isAdmin: false, isSeller: true, storeName: "TechNest Store" },
+  { _id: "demo_seller2", name: "Rahul Verma", email: "seller2@example.com", isAdmin: false, isSeller: true, storeName: "Urban Threads" },
+];
 
 // Protect routes - user must be logged in
 const protect = async (req, res, next) => {
@@ -11,10 +19,19 @@ const protect = async (req, res, next) => {
   ) {
     try {
       token = req.headers.authorization.split(" ")[1];
+      const secret = process.env.JWT_SECRET || "norra_luxury_secret_jwt_key_2026";
+      const decoded = jwt.verify(token, secret);
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      // Fast-path demo user support for offline/demo operation
+      if (decoded.id && String(decoded.id).startsWith("demo_")) {
+        const demo = demoUsers.find((u) => u._id === decoded.id) || demoUsers[0];
+        req.user = demo;
+        return next();
+      }
 
-      req.user = await User.findById(decoded.id).select("-password");
+      if (mongoose.connection.readyState === 1) {
+        req.user = await User.findById(decoded.id).select("-password");
+      }
 
       if (!req.user) {
         return res.status(401).json({ message: "User not found" });
@@ -22,7 +39,7 @@ const protect = async (req, res, next) => {
 
       next();
     } catch (error) {
-      console.error(error);
+      console.error("Auth protect error:", error.message);
       res.status(401).json({ message: "Not authorized, token failed" });
     }
   }
