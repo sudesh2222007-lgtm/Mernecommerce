@@ -113,7 +113,7 @@ const Login = () => {
                 className="demo-chip"
                 onClick={() => handleQuickLogin("seller1@example.com", "123456")}
               >
-                Seller (TechNest)
+                Seller
               </button>
             </div>
           </div>

@@ -62,7 +62,7 @@ const getProducts = async (req, res) => {
     const filter = { ...keyword, ...category };
 
     // Parallel execution with lean querying and omitting heavy review subdocuments
-    const [totalFiltered, products] = await Promise.all([
+    const [totalFiltered, rawProducts] = await Promise.all([
       Product.countDocuments(filter),
       Product.find(filter)
         .select("-reviews")
@@ -71,6 +71,16 @@ const getProducts = async (req, res) => {
         .sort({ createdAt: -1 })
         .lean(),
     ]);
+
+    const products = rawProducts.map((p) => {
+      if (!p.image || String(p.image).includes("1539533018447")) {
+        return {
+          ...p,
+          image: "https://images.unsplash.com/photo-1544923246-77307dd654cb?auto=format&fit=crop&w=800&q=80",
+        };
+      }
+      return p;
+    });
 
     // Enable high-speed Edge & Browser caching for default catalog views
     if (!req.query.keyword) {
@@ -99,6 +109,9 @@ const getProductById = async (req, res) => {
       try {
         const product = await Product.findById(req.params.id).lean();
         if (product) {
+          if (!product.image || String(product.image).includes("1539533018447")) {
+            product.image = "https://images.unsplash.com/photo-1544923246-77307dd654cb?auto=format&fit=crop&w=800&q=80";
+          }
           res.set("Cache-Control", "public, max-age=60, s-maxage=120, stale-while-revalidate=600");
           return res.json(product);
         }

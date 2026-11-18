@@ -30,11 +30,11 @@ const users = [
     isAdmin: false,
   },
   {
-    name: "Priya Sharma",
+    name: "Seller",
     email: "seller1@example.com",
     password: "123456",
     isSeller: true,
-    storeName: "TechNest Store",
+    storeName: "Seller Store",
   },
   {
     name: "Rahul Verma",
@@ -368,7 +368,7 @@ const importData = async () => {
     console.log("\nDemo accounts:");
     console.log("  Admin   -> admin@example.com / 123456");
     console.log("  Buyer   -> john@example.com / 123456");
-    console.log("  Seller  -> seller1@example.com / 123456  (TechNest Store — Electronics)");
+    console.log("  Seller  -> seller1@example.com / 123456  (Seller Store)");
     console.log("  Seller  -> seller2@example.com / 123456  (Urban Threads — Footwear/Fashion/Accessories)\n");
     process.exit();
   } catch (error) {

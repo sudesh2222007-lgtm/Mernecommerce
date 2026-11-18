@@ -51,12 +51,22 @@ const getMyProducts = async (req, res) => {
     // Merge: DB items, seller's catalog products, and created in-memory items (dedup by _id)
     const combined = [...products, ...sellerCatalog, ...memProducts];
     const seen = new Set();
-    const deduped = combined.filter((p) => {
-      const id = String(p._id);
-      if (seen.has(id)) return false;
-      seen.add(id);
-      return true;
-    });
+    const deduped = combined
+      .filter((p) => {
+        const id = String(p._id);
+        if (seen.has(id)) return false;
+        seen.add(id);
+        return true;
+      })
+      .map((p) => {
+        if (!p.image || String(p.image).includes("1539533018447")) {
+          return {
+            ...p,
+            image: "https://images.unsplash.com/photo-1544923246-77307dd654cb?auto=format&fit=crop&w=800&q=80",
+          };
+        }
+        return p;
+      });
 
     res.json(deduped);
   } catch (error) {

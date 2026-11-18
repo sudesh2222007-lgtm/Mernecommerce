@@ -361,10 +361,13 @@ const SellerProducts = () => {
                 <tr key={p._id}>
                   <td>
                     <img
-                      src={p.image}
+                      src={p.image || "https://images.unsplash.com/photo-1544923246-77307dd654cb?auto=format&fit=crop&w=800&q=80"}
                       alt={p.name}
                       className="table-thumb"
-                      onError={(e) => (e.target.style.visibility = "hidden")}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "https://images.unsplash.com/photo-1544923246-77307dd654cb?auto=format&fit=crop&w=800&q=80";
+                      }}
                     />
                   </td>
                   <td>

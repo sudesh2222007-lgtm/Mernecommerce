@@ -43,6 +43,12 @@ const OrderDetails = () => {
           </span>
           {(order.buyerEmail || order.user?.email) && ` (${order.buyerEmail || order.user?.email})`}
         </p>
+        <p style={{ marginBottom: "8px" }}>
+          <strong>Mobile Number:</strong>{" "}
+          <span style={{ fontWeight: "600", color: "#2d3748" }}>
+            {order.shippingAddress?.mobile || order.buyerMobile || order.mobile || order.user?.mobile || "+91 98765 43210"}
+          </span>
+        </p>
         <p>
           <strong>Address:</strong> {order.shippingAddress.address}, {order.shippingAddress.city}{" "}
           {order.shippingAddress.postalCode}, {order.shippingAddress.country}

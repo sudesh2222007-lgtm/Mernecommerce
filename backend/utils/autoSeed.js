@@ -13,13 +13,14 @@ const users = [
     email: "john@example.com",
     password: "123456",
     isAdmin: false,
+    mobile: "+91 98765 43210",
   },
   {
-    name: "Priya Sharma",
+    name: "Seller",
     email: "seller1@example.com",
     password: "123456",
     isSeller: true,
-    storeName: "TechNest Store",
+    storeName: "Seller Store",
   },
 ];
 
@@ -81,7 +82,7 @@ const sampleProducts = [
   },
   {
     name: "Cashmere Wool Tailored Overcoat",
-    image: "https://images.unsplash.com/photo-1539533018447-63fcce667823?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1544923246-77307dd654cb?auto=format&fit=crop&w=800&q=80",
     description: "Double-faced Mongolian cashmere blend coat with horn buttons and unstructured soft shoulder tailoring.",
     category: "Fashion",
     brand: "Norra Atelier",
@@ -133,7 +134,7 @@ const sampleProducts = [
   },
 
   // ========================================================
-  // --- TechNest Store (demo_seller1 - Priya Sharma) ---
+  // --- Seller Store (demo_seller1 - Seller) ---
   // ========================================================
   {
     name: "Aria Wireless ANC Headphones",
@@ -228,7 +229,7 @@ const sampleProducts = [
   },
   {
     name: "UltraCharge Wireless Desktop Hub",
-    image: "https://images.unsplash.com/photo-1622445262464-84b14e3235b3?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1586953208448-b95a79798f07?auto=format&fit=crop&w=800&q=80",
     description: "3-in-1 magnetic wireless charging station in aerospace anodized aluminum with 15W fast charging output.",
     category: "Electronics",
     brand: "TimeTech",
@@ -271,6 +272,24 @@ const autoSeedIfEmpty = async () => {
         }));
         await Product.insertMany(products);
         console.log(`✅ Auto-seeding completed: ${products.length} products inserted.`);
+      } else {
+        // Database already has records: seamlessly heal any known broken images or seller names
+        try {
+          await Product.updateMany(
+            { image: { $regex: /1539533018447/ } },
+            { $set: { image: "https://images.unsplash.com/photo-1544923246-77307dd654cb?auto=format&fit=crop&w=800&q=80" } }
+          );
+          await Product.updateMany(
+            { name: "Cashmere Wool Tailored Overcoat", image: { $regex: /1539533018447/ } },
+            { $set: { image: "https://images.unsplash.com/photo-1544923246-77307dd654cb?auto=format&fit=crop&w=800&q=80" } }
+          );
+          await User.updateMany(
+            { email: "seller1@example.com" },
+            { $set: { name: "Seller", storeName: "Seller Store" } }
+          );
+        } catch (healErr) {
+          console.warn("DB heal notice:", healErr.message);
+        }
       }
       seeded = true;
     } catch (err) {

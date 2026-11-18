@@ -5,7 +5,7 @@ const User = require("../models/User");
 const demoUsers = [
   { _id: "demo_admin", name: "Admin User", email: "admin@example.com", isAdmin: true, isSeller: false },
   { _id: "demo_john", name: "John Doe", email: "john@example.com", isAdmin: false, isSeller: false },
-  { _id: "demo_seller1", name: "Priya Sharma", email: "seller1@example.com", isAdmin: false, isSeller: true, storeName: "TechNest Store" },
+  { _id: "demo_seller1", name: "Seller", email: "seller1@example.com", isAdmin: false, isSeller: true, storeName: "Seller Store" },
   { _id: "demo_seller2", name: "Rahul Verma", email: "seller2@example.com", isAdmin: false, isSeller: true, storeName: "Urban Threads" },
 ];
 

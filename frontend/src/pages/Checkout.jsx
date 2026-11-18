@@ -12,6 +12,7 @@ const Checkout = () => {
   const [city, setCity] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [country, setCountry] = useState("India");
+  const [mobile, setMobile] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("Cash on Delivery");
   const [error, setError] = useState("");
 
@@ -32,7 +33,8 @@ const Checkout = () => {
 
       const { data } = await api.post("/orders", {
         orderItems,
-        shippingAddress: { address, city, postalCode, country },
+        shippingAddress: { address, city, postalCode, country, mobile },
+        mobile,
         paymentMethod,
         itemsPrice,
         shippingPrice,
@@ -56,6 +58,14 @@ const Checkout = () => {
       <h1>Checkout</h1>
       {error && <p className="error">{error}</p>}
       <form onSubmit={placeOrderHandler}>
+        <label>Mobile Number</label>
+        <input
+          type="tel"
+          placeholder="e.g. +91 98765 43210"
+          value={mobile}
+          onChange={(e) => setMobile(e.target.value)}
+          required
+        />
         <label>Address</label>
         <input value={address} onChange={(e) => setAddress(e.target.value)} required />
         <label>City</label>
