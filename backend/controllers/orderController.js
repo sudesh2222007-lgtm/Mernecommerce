@@ -229,12 +229,22 @@ const updateOrderToDelivered = async (req, res) => {
 // @access  Private/Admin
 const getOrders = async (req, res) => {
   try {
-    const orders = await Order.find({}).populate("user", "id name").sort({
-      createdAt: -1,
-    });
+    let orders = [];
+    if (mongoose.connection.readyState === 1) {
+      try {
+        orders = await Order.find({}).populate("user", "id name").sort({
+          createdAt: -1,
+        }).lean();
+      } catch (e) {
+        orders = [];
+      }
+    }
+    if (global.fallbackOrders && global.fallbackOrders.length > 0) {
+      orders = [...orders, ...global.fallbackOrders];
+    }
     res.json(orders);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.json(global.fallbackOrders || []);
   }
 };
 
@@ -244,29 +254,52 @@ const getOrders = async (req, res) => {
 // @access  Private/Seller
 const getSellerOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ "orderItems.seller": req.user._id })
-      .populate("user", "name email")
-      .sort({ createdAt: -1 });
+    let dbOrders = [];
+    if (mongoose.connection.readyState === 1) {
+      try {
+        const query = req.user.isAdmin
+          ? {}
+          : { "orderItems.seller": req.user._id };
+        dbOrders = await Order.find(query)
+          .populate("user", "name email")
+          .sort({ createdAt: -1 })
+          .lean();
+      } catch (err) {
+        console.warn("MongoDB getSellerOrders query error:", err.message);
+        dbOrders = [];
+      }
+    }
 
-    const scoped = orders.map((order) => {
-      const myItems = order.orderItems.filter(
-        (item) => item.seller.toString() === req.user._id.toString()
-      );
-      return {
-        _id: order._id,
-        user: order.user,
-        shippingAddress: order.shippingAddress,
-        paymentMethod: order.paymentMethod,
-        isPaid: order.isPaid,
-        paidAt: order.paidAt,
-        createdAt: order.createdAt,
-        orderItems: myItems,
-        myItemsTotal: myItems.reduce((sum, i) => sum + i.price * i.qty, 0),
-      };
-    });
+    const allOrders = [...dbOrders, ...(global.fallbackOrders || [])];
+
+    const scoped = allOrders
+      .map((order) => {
+        const myItems = (order.orderItems || []).filter((item) => {
+          if (req.user.isAdmin) return true;
+          return item.seller && String(item.seller) === String(req.user._id);
+        });
+
+        if (myItems.length === 0) return null;
+
+        return {
+          _id: order._id,
+          user: order.user,
+          shippingAddress: order.shippingAddress,
+          paymentMethod: order.paymentMethod,
+          isPaid: order.isPaid,
+          paidAt: order.paidAt,
+          isDelivered: order.isDelivered,
+          deliveredAt: order.deliveredAt,
+          createdAt: order.createdAt,
+          orderItems: myItems,
+          myItemsTotal: myItems.reduce((sum, i) => sum + (i.price || 0) * (i.qty || 1), 0),
+        };
+      })
+      .filter(Boolean);
 
     res.json(scoped);
   } catch (error) {
+    console.error("getSellerOrders error:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -277,39 +310,63 @@ const getSellerOrders = async (req, res) => {
 // @access  Private/Seller
 const updateOrderItemDelivered = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id);
+    let order = null;
+    if (mongoose.connection.readyState === 1) {
+      try {
+        order = await Order.findById(req.params.id);
+      } catch (e) {}
+    }
 
-    if (!order) {
+    if (order) {
+      const item = order.orderItems.id(req.params.itemId);
+
+      if (!item) {
+        return res.status(404).json({ message: "Order item not found" });
+      }
+
+      const isOwner = item.seller && String(item.seller) === String(req.user._id);
+      if (!isOwner && !req.user.isAdmin) {
+        return res
+          .status(403)
+          .json({ message: "Not authorized to update this item" });
+      }
+
+      item.isDelivered = true;
+      item.deliveredAt = Date.now();
+
+      if (order.orderItems.every((i) => i.isDelivered)) {
+        order.isDelivered = true;
+        order.deliveredAt = Date.now();
+      }
+
+      await order.save();
+      return res.json(order);
+    }
+
+    // In-memory fallback order update
+    const memOrder = (global.fallbackOrders || []).find(
+      (o) => String(o._id) === String(req.params.id)
+    );
+
+    if (!memOrder) {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    const item = order.orderItems.id(req.params.itemId);
+    const memItem = (memOrder.orderItems || []).find(
+      (i) => String(i._id || i.product) === String(req.params.itemId)
+    );
 
-    if (!item) {
-      return res.status(404).json({ message: "Order item not found" });
+    if (memItem) {
+      memItem.isDelivered = true;
+      memItem.deliveredAt = new Date().toISOString();
     }
 
-    if (
-      item.seller.toString() !== req.user._id.toString() &&
-      !req.user.isAdmin
-    ) {
-      return res
-        .status(403)
-        .json({ message: "Not authorized to update this item" });
+    if ((memOrder.orderItems || []).every((i) => i.isDelivered)) {
+      memOrder.isDelivered = true;
+      memOrder.deliveredAt = new Date().toISOString();
     }
 
-    item.isDelivered = true;
-    item.deliveredAt = Date.now();
-
-    // If every item in the order is now delivered, mark the whole order
-    // delivered too (kept for backward compatibility / the customer's view).
-    if (order.orderItems.every((i) => i.isDelivered)) {
-      order.isDelivered = true;
-      order.deliveredAt = Date.now();
-    }
-
-    await order.save();
-    res.json(order);
+    res.json(memOrder);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

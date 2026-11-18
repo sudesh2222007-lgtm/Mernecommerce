@@ -10,15 +10,15 @@ const fallbackProducts = (autoSeed.sampleProducts || []).map((p, idx) => ({
 }));
 
 const getFallbackCatalog = (category, keyword, page, pageSize) => {
-  let list = fallbackProducts;
+  let list = [...(global.sellerProducts || []), ...fallbackProducts];
   if (category && category !== "All") {
-    list = list.filter((p) => p.category.toLowerCase() === category.toLowerCase());
+    list = list.filter((p) => p.category && p.category.toLowerCase() === category.toLowerCase());
   }
   if (keyword) {
     const k = keyword.toLowerCase();
     list = list.filter(
       (p) =>
-        p.name.toLowerCase().includes(k) ||
+        (p.name && p.name.toLowerCase().includes(k)) ||
         (p.brand && p.brand.toLowerCase().includes(k)) ||
         (p.category && p.category.toLowerCase().includes(k))
     );
@@ -96,20 +96,24 @@ const getProducts = async (req, res) => {
 const getProductById = async (req, res) => {
   try {
     if (mongoose.connection.readyState === 1) {
-      const product = await Product.findById(req.params.id).lean();
-      if (product) {
-        res.set("Cache-Control", "public, max-age=60, s-maxage=120, stale-while-revalidate=600");
-        return res.json(product);
-      }
+      try {
+        const product = await Product.findById(req.params.id).lean();
+        if (product) {
+          res.set("Cache-Control", "public, max-age=60, s-maxage=120, stale-while-revalidate=600");
+          return res.json(product);
+        }
+      } catch (e) {}
     }
-    const sample = fallbackProducts.find((p) => p._id === req.params.id);
+    const allFallback = [...(global.sellerProducts || []), ...fallbackProducts];
+    const sample = allFallback.find((p) => String(p._id) === String(req.params.id));
     if (sample) {
       res.set("Cache-Control", "public, max-age=60, s-maxage=120, stale-while-revalidate=600");
       return res.json(sample);
     }
     res.status(404).json({ message: "Product not found" });
   } catch (error) {
-    const sample = fallbackProducts.find((p) => p._id === req.params.id);
+    const allFallback = [...(global.sellerProducts || []), ...fallbackProducts];
+    const sample = allFallback.find((p) => String(p._id) === String(req.params.id));
     if (sample) return res.json(sample);
     res.status(500).json({ message: error.message });
   }
@@ -123,20 +127,46 @@ const createProduct = async (req, res) => {
     const { name, price, mrp, description, image, brand, category, countInStock } =
       req.body;
 
-    const product = new Product({
+    if (mongoose.connection.readyState === 1) {
+      try {
+        const product = new Product({
+          user: req.user._id,
+          name: name || "Sample name",
+          price: Number(price) || 0,
+          mrp: Number(mrp) || 0,
+          description: description || "Sample description",
+          image: image || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80",
+          brand: brand || "Norra Atelier",
+          category: category || "Accessories",
+          countInStock: countInStock !== undefined ? Number(countInStock) : 10,
+        });
+
+        const createdProduct = await product.save();
+        return res.status(201).json(createdProduct);
+      } catch (dbErr) {
+        console.warn("MongoDB createProduct error:", dbErr.message);
+      }
+    }
+
+    const fallbackProduct = {
+      _id: "prod_" + Date.now() + "_" + Math.random().toString(36).substring(2, 7),
       user: req.user._id,
       name: name || "Sample name",
-      price: price || 0,
-      mrp: mrp || 0,
+      price: Number(price) || 0,
+      mrp: Number(mrp) || 0,
       description: description || "Sample description",
-      image: image || "/images/sample.jpg",
-      brand: brand || "Sample brand",
-      category: category || "Sample category",
-      countInStock: countInStock || 0,
-    });
+      image: image || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80",
+      brand: brand || "Norra Atelier",
+      category: category || "Accessories",
+      countInStock: countInStock !== undefined ? Number(countInStock) : 10,
+      rating: 5,
+      numReviews: 0,
+      createdAt: new Date().toISOString(),
+    };
 
-    const createdProduct = await product.save();
-    res.status(201).json(createdProduct);
+    global.sellerProducts = global.sellerProducts || [];
+    global.sellerProducts.unshift(fallbackProduct);
+    res.status(201).json(fallbackProduct);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -150,23 +180,39 @@ const updateProduct = async (req, res) => {
     const { name, price, mrp, description, image, brand, category, countInStock } =
       req.body;
 
-    const product = await Product.findById(req.params.id);
+    if (mongoose.connection.readyState === 1) {
+      try {
+        const product = await Product.findById(req.params.id);
+        if (product) {
+          product.name = name ?? product.name;
+          product.price = price !== undefined ? Number(price) : product.price;
+          product.mrp = mrp !== undefined ? Number(mrp) : product.mrp;
+          product.description = description ?? product.description;
+          product.image = image ?? product.image;
+          product.brand = brand ?? product.brand;
+          product.category = category ?? product.category;
+          product.countInStock = countInStock !== undefined ? Number(countInStock) : product.countInStock;
 
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+          const updatedProduct = await product.save();
+          return res.json(updatedProduct);
+        }
+      } catch (e) {}
     }
 
-    product.name = name ?? product.name;
-    product.price = price ?? product.price;
-    product.mrp = mrp ?? product.mrp;
-    product.description = description ?? product.description;
-    product.image = image ?? product.image;
-    product.brand = brand ?? product.brand;
-    product.category = category ?? product.category;
-    product.countInStock = countInStock ?? product.countInStock;
+    const mem = (global.sellerProducts || []).find((p) => String(p._id) === String(req.params.id));
+    if (mem) {
+      mem.name = name ?? mem.name;
+      mem.price = price !== undefined ? Number(price) : mem.price;
+      mem.mrp = mrp !== undefined ? Number(mrp) : mem.mrp;
+      mem.description = description ?? mem.description;
+      mem.image = image ?? mem.image;
+      mem.brand = brand ?? mem.brand;
+      mem.category = category ?? mem.category;
+      mem.countInStock = countInStock !== undefined ? Number(countInStock) : mem.countInStock;
+      return res.json(mem);
+    }
 
-    const updatedProduct = await product.save();
-    res.json(updatedProduct);
+    res.status(404).json({ message: "Product not found" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -177,14 +223,25 @@ const updateProduct = async (req, res) => {
 // @access  Private/Admin
 const deleteProduct = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
-
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+    if (mongoose.connection.readyState === 1) {
+      try {
+        const product = await Product.findById(req.params.id);
+        if (product) {
+          await product.deleteOne();
+          return res.json({ message: "Product removed" });
+        }
+      } catch (e) {}
     }
 
-    await product.deleteOne();
-    res.json({ message: "Product removed" });
+    const idx = (global.sellerProducts || []).findIndex(
+      (p) => String(p._id) === String(req.params.id)
+    );
+    if (idx !== -1) {
+      global.sellerProducts.splice(idx, 1);
+      return res.json({ message: "Product removed" });
+    }
+
+    res.status(404).json({ message: "Product not found" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

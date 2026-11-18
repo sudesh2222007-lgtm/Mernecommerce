@@ -6,7 +6,7 @@ const orderItemSchema = new mongoose.Schema({
   image: { type: String, required: true },
   price: { type: Number, required: true },
   product: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.Mixed,
     required: true,
     ref: "Product",
   },
@@ -14,8 +14,9 @@ const orderItemSchema = new mongoose.Schema({
   // Lets a seller filter down to only the items that belong to them, even
   // when a single order contains products from several different sellers.
   seller: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
+    type: mongoose.Schema.Types.Mixed,
+    required: false,
+    default: null,
     ref: "User",
   },
   // Delivery is tracked per item since different sellers ship independently.
@@ -26,7 +27,7 @@ const orderItemSchema = new mongoose.Schema({
 const orderSchema = new mongoose.Schema(
   {
     user: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.Mixed,
       required: true,
       ref: "User",
     },

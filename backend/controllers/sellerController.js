@@ -1,14 +1,31 @@
+const mongoose = require("mongoose");
 const Product = require("../models/Product");
+
+global.sellerProducts = global.sellerProducts || [];
 
 // @desc    Get products belonging to the logged-in seller
 // @route   GET /api/seller/products
 // @access  Private/Seller
 const getMyProducts = async (req, res) => {
   try {
-    const products = await Product.find({ user: req.user._id }).sort({
-      createdAt: -1,
-    });
-    res.json(products);
+    let products = [];
+    if (mongoose.connection.readyState === 1) {
+      try {
+        const query = req.user.isAdmin ? {} : { user: req.user._id };
+        products = await Product.find(query).sort({
+          createdAt: -1,
+        }).lean();
+      } catch (e) {
+        console.warn("MongoDB getMyProducts error:", e.message);
+        products = [];
+      }
+    }
+
+    const memProducts = (global.sellerProducts || []).filter((p) =>
+      req.user.isAdmin ? true : String(p.user) === String(req.user._id)
+    );
+
+    res.json([...products, ...memProducts]);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -28,20 +45,44 @@ const createMyProduct = async (req, res) => {
       });
     }
 
-    const product = new Product({
+    if (mongoose.connection.readyState === 1) {
+      try {
+        const product = new Product({
+          user: req.user._id,
+          name,
+          price: Number(price),
+          mrp: Number(mrp) || 0,
+          description,
+          image: image || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80",
+          brand: brand || "Generic",
+          category,
+          countInStock: countInStock !== undefined ? Number(countInStock) : 0,
+        });
+
+        const createdProduct = await product.save();
+        return res.status(201).json(createdProduct);
+      } catch (dbErr) {
+        console.warn("MongoDB createMyProduct save error:", dbErr.message);
+      }
+    }
+
+    const newProduct = {
+      _id: "prod_" + Date.now() + "_" + Math.random().toString(36).substring(2, 7),
       user: req.user._id,
       name,
-      price,
-      mrp: mrp || 0,
+      price: Number(price),
+      mrp: Number(mrp) || Number(price),
       description,
-      image: image || "/images/sample.jpg",
-      brand: brand || "Generic",
+      image: image || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80",
+      brand: brand || "Norra Atelier",
       category,
-      countInStock: countInStock ?? 0,
-    });
+      countInStock: countInStock !== undefined ? Number(countInStock) : 10,
+      createdAt: new Date().toISOString(),
+    };
 
-    const createdProduct = await product.save();
-    res.status(201).json(createdProduct);
+    global.sellerProducts = global.sellerProducts || [];
+    global.sellerProducts.unshift(newProduct);
+    res.status(201).json(newProduct);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -52,32 +93,61 @@ const createMyProduct = async (req, res) => {
 // @access  Private/Seller
 const updateMyProduct = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    if (mongoose.connection.readyState === 1) {
+      try {
+        const product = await Product.findById(req.params.id);
 
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+        if (product) {
+          const isOwner = product.user && String(product.user) === String(req.user._id);
+          if (!isOwner && !req.user.isAdmin) {
+            return res
+              .status(403)
+              .json({ message: "You can only edit your own products" });
+          }
+
+          const { name, price, mrp, description, image, brand, category, countInStock } =
+            req.body;
+
+          product.name = name ?? product.name;
+          product.price = price !== undefined ? Number(price) : product.price;
+          product.mrp = mrp !== undefined ? Number(mrp) : product.mrp;
+          product.description = description ?? product.description;
+          product.image = image ?? product.image;
+          product.brand = brand ?? product.brand;
+          product.category = category ?? product.category;
+          product.countInStock = countInStock !== undefined ? Number(countInStock) : product.countInStock;
+
+          const updatedProduct = await product.save();
+          return res.json(updatedProduct);
+        }
+      } catch (e) {}
     }
 
-    if (product.user.toString() !== req.user._id.toString() && !req.user.isAdmin) {
-      return res
-        .status(403)
-        .json({ message: "You can only edit your own products" });
+    const mem = (global.sellerProducts || []).find((p) => String(p._id) === String(req.params.id));
+    if (mem) {
+      const isOwner = mem.user && String(mem.user) === String(req.user._id);
+      if (!isOwner && !req.user.isAdmin) {
+        return res
+          .status(403)
+          .json({ message: "You can only edit your own products" });
+      }
+
+      const { name, price, mrp, description, image, brand, category, countInStock } =
+        req.body;
+
+      mem.name = name ?? mem.name;
+      mem.price = price !== undefined ? Number(price) : mem.price;
+      mem.mrp = mrp !== undefined ? Number(mrp) : mem.mrp;
+      mem.description = description ?? mem.description;
+      mem.image = image ?? mem.image;
+      mem.brand = brand ?? mem.brand;
+      mem.category = category ?? mem.category;
+      mem.countInStock = countInStock !== undefined ? Number(countInStock) : mem.countInStock;
+
+      return res.json(mem);
     }
 
-    const { name, price, mrp, description, image, brand, category, countInStock } =
-      req.body;
-
-    product.name = name ?? product.name;
-    product.price = price ?? product.price;
-    product.mrp = mrp ?? product.mrp;
-    product.description = description ?? product.description;
-    product.image = image ?? product.image;
-    product.brand = brand ?? product.brand;
-    product.category = category ?? product.category;
-    product.countInStock = countInStock ?? product.countInStock;
-
-    const updatedProduct = await product.save();
-    res.json(updatedProduct);
+    res.status(404).json({ message: "Product not found" });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -88,20 +158,40 @@ const updateMyProduct = async (req, res) => {
 // @access  Private/Seller
 const deleteMyProduct = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    if (mongoose.connection.readyState === 1) {
+      try {
+        const product = await Product.findById(req.params.id);
 
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+        if (product) {
+          const isOwner = product.user && String(product.user) === String(req.user._id);
+          if (!isOwner && !req.user.isAdmin) {
+            return res
+              .status(403)
+              .json({ message: "You can only delete your own products" });
+          }
+
+          await product.deleteOne();
+          return res.json({ message: "Product removed" });
+        }
+      } catch (e) {}
     }
 
-    if (product.user.toString() !== req.user._id.toString() && !req.user.isAdmin) {
-      return res
-        .status(403)
-        .json({ message: "You can only delete your own products" });
+    const idx = (global.sellerProducts || []).findIndex(
+      (p) => String(p._id) === String(req.params.id)
+    );
+    if (idx !== -1) {
+      const mem = global.sellerProducts[idx];
+      const isOwner = mem.user && String(mem.user) === String(req.user._id);
+      if (!isOwner && !req.user.isAdmin) {
+        return res
+          .status(403)
+          .json({ message: "You can only delete your own products" });
+      }
+      global.sellerProducts.splice(idx, 1);
+      return res.json({ message: "Product removed" });
     }
 
-    await product.deleteOne();
-    res.json({ message: "Product removed" });
+    res.status(404).json({ message: "Product not found" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -112,18 +202,32 @@ const deleteMyProduct = async (req, res) => {
 // @access  Private/Seller
 const getSellerSummary = async (req, res) => {
   try {
-    const products = await Product.find({ user: req.user._id });
-    const totalProducts = products.length;
-    const outOfStock = products.filter((p) => p.countInStock === 0).length;
-    const lowStock = products.filter(
-      (p) => p.countInStock > 0 && p.countInStock <= 5
+    let products = [];
+    if (mongoose.connection.readyState === 1) {
+      try {
+        const query = req.user.isAdmin ? {} : { user: req.user._id };
+        products = await Product.find(query).lean();
+      } catch (e) {
+        products = [];
+      }
+    }
+
+    const memProducts = (global.sellerProducts || []).filter((p) =>
+      req.user.isAdmin ? true : String(p.user) === String(req.user._id)
+    );
+    const combined = [...products, ...memProducts];
+
+    const totalProducts = combined.length;
+    const outOfStock = combined.filter((p) => Number(p.countInStock) === 0).length;
+    const lowStock = combined.filter(
+      (p) => Number(p.countInStock) > 0 && Number(p.countInStock) <= 5
     ).length;
 
     res.json({
       totalProducts,
       outOfStock,
       lowStock,
-      storeName: req.user.storeName || req.user.name,
+      storeName: req.user.storeName || req.user.name || "Norra Atelier",
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
