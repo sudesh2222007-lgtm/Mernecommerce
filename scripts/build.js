@@ -10,14 +10,21 @@ try {
   execSync("npm --prefix frontend run build", { stdio: "inherit" });
 
   const src = path.join(__dirname, "..", "frontend", "dist");
-  const dest = path.join(__dirname, "..", "dist");
+  const distDest = path.join(__dirname, "..", "dist");
+  const pubDest = path.join(__dirname, "..", "public");
 
-  console.log(`📁 Copying build output from ${src} to ${dest}...`);
-  if (fs.existsSync(dest)) {
-    fs.rmSync(dest, { recursive: true, force: true });
+  console.log(`📁 Copying build output to dist and public...`);
+  if (fs.existsSync(distDest)) {
+    fs.rmSync(distDest, { recursive: true, force: true });
   }
-  fs.cpSync(src, dest, { recursive: true });
-  console.log("✅ Build completed successfully!");
+  fs.cpSync(src, distDest, { recursive: true });
+
+  if (fs.existsSync(pubDest)) {
+    fs.rmSync(pubDest, { recursive: true, force: true });
+  }
+  fs.cpSync(src, pubDest, { recursive: true });
+
+  console.log("✅ Build and distribution sync completed successfully!");
 } catch (err) {
   console.error("❌ Build failed:", err.message);
   process.exit(1);
