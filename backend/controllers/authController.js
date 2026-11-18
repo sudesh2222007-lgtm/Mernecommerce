@@ -156,9 +156,6 @@ const getUserProfile = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-    res.status(500).json({ message: error.message });
-  }
-};
 
 // @desc    Send OTP to user phone
 // @route   POST /api/auth/send-otp
